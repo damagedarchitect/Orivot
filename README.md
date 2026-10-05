@@ -78,9 +78,24 @@ Orivot Basic and Orivot Pro are available from the author: **[contact on Discord
 Orivot Pro provides production tools from snapping origins to objects to fabrication files for CNC cutting and more.
 With more tools in the Edit Mode that makes your modelling life faster, precise and easier:
 
-| Object Mode | Edit Mode |
-| ------------- | ------------- |
-| <img src="https://github.com/user-attachments/assets/5e085e31-6a79-4f57-a608-2e3c02f44c2f" width="100%" alt="Orivot Pro Object Mode" /> | <img src="https://github.com/user-attachments/assets/965d6724-a808-4614-bdaf-40a0b4a9d789" width="100%" alt="Orivot Pro Edit Mode" /> |
+<table>
+  <thead>
+    <tr>
+      <th width="50%">Object Mode</th>
+      <th width="50%">Edit Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top">
+        <img src="https://github.com" width="100%" alt="Orivot Pro Object Mode" />
+      </td>
+      <td valign="top">
+        <img src="https://github.com" width="100%" alt="Orivot Pro Edit Mode" />
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Support
 
