@@ -1,0 +1,26 @@
+schema_version = "1.0.0"
+
+# ── Identity ──────────────────────────────────────────────────────────────────
+id = "orivot_free"
+version = "4.2.4"
+name = "Orivot Free"
+tagline = "Snap the origin to 39 exact points on sides, corners and edges"
+maintainer = "Crater Creative <cratercreativeconsultancy@gmail.com>"
+type = "add-on"
+
+# ── Links (optional but recommended) ──────────────────────────────────────────
+website = "https://discord.com/users/damagedarchitect"
+
+# ── Discovery ─────────────────────────────────────────────────────────────────
+tags = ["Object", "Modeling", "Pipeline"]
+
+# ── Compatibility ─────────────────────────────────────────────────────────────
+blender_version_min = "4.5.0"
+
+# ── Legal ─────────────────────────────────────────────────────────────────────
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+copyright = [
+  "2026 Crater Creative Consultancy L.L.C.",
+]
