@@ -88,10 +88,10 @@ With more tools in the Edit Mode that makes your modelling life faster, precise 
   <tbody>
     <tr>
       <td valign="top">
-        <img src="https://github.com" width="100%" alt="Orivot Pro Object Mode" />
+        <img src="https://github.com/user-attachments/assets/04b0e6d0-803f-44fa-b316-c61b93b5cbe6" />" width="100%" alt="Orivot Pro Object Mode" />
       </td>
       <td valign="top">
-        <img src="https://github.com" width="100%" alt="Orivot Pro Edit Mode" />
+        <img src="https://github.com/user-attachments/assets/ad83dedc-c85d-4eab-829e-f64426094ad0" />" width="100%" alt="Orivot Pro Edit Mode" />
       </td>
     </tr>
   </tbody>
