@@ -79,7 +79,7 @@ Orivot Pro provides production tools from snapping origins to objects to fabrica
 With more tools in the Edit Mode that makes your modelling life easier:
 | Object Mode | Edit Mode |
 | ------------- | ------------- |
-| ![Orivot Pro Object Mode](<img width="928" height="11703" alt="Orivot UI" src="https://github.com/user-attachments/assets/53be7b5b-f522-413f-880e-e4f82f159415" />) | ![Orivot Pro Edit Mode](<img width="928" height="7392" alt="Edit Mode" src="https://github.com/user-attachments/assets/4d409ac4-c261-4781-94f0-376ff3c31118" />) |
+| ![Orivot Pro Object Mode](<img width="928" height="11703" alt="Orivot UI" src="https://github.com/user-attachments/assets/5e085e31-6a79-4f57-a608-2e3c02f44c2f" />) | ![Orivot Pro Edit Mode](<img width="928" height="7392" alt="Edit Mode" src="https://github.com/user-attachments/assets/965d6724-a808-4614-bdaf-40a0b4a9d789" />) |
 
 ## Support
 
