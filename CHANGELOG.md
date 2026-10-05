@@ -5,7 +5,7 @@
 - **Buttons that can't act are greyed out**, with the reason in their tooltip, instead of failing when clicked. This covers Snap Points and the 3D Cursor snap when a curve, text or empty is active or selected. World Zero stays available.
 - Smaller download: the Free build ships only Free's own code (about 0.37 MB).
 
-## 4.2.3 — first Orivot release
+## 4.2.3 - first Orivot release
 
 Orivot Free is now built from the same source as Orivot Pro, so it has the Pro layout and every Pro fix.
 
@@ -20,3 +20,4 @@ Orivot Free is now built from the same source as Orivot Pro, so it has the Pro l
   - Swap Left / Right labels.
 - **Alt+Q pie** with configurable slots, and the Object ▸ Set Origin to... menu.
 - **Settings from Basic or Pro files are ignored.** A file saved in those editions may hold Offset, Freeze or Multi-Object settings. Free ignores them, so a Free snap always lands on the exact point.
+- **Clickable bounding-box handles moved to Orivot Basic.**
