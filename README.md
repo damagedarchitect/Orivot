@@ -1,101 +1,95 @@
 <img width="1024" height="568" alt="image" src="https://github.com/user-attachments/assets/aebcd89c-42d1-4ff5-97e5-c508b4150fe8" />
-<img width="246" height="457" alt="image" src="https://github.com/user-attachments/assets/19534147-5a95-4d2a-ba18-677427162fb4" />
+<img width="314" height="922" alt="image" src="https://github.com/user-attachments/assets/defeea72-ba43-4125-8918-428a6eb18a4e" />
 
-# Radix | A 39 Precision Origin Placement for Blender
 
-**Radix Free** puts all 39 snap positions one dropdown away to any face, corner, edge midpoint, or center of any mesh, plus clickable viewport handles for the fastest common positions.
+# Orivot Free
 
-Built for architects, product designers, and anyone who needs clean pivot points without fighting Blender's default origin tools.
+**Exact origin placement for Blender.** Snap an object's origin to 39 exact points: its extreme sides, corners, edge midpoints and face centres, or to its geometry, bounding-box or mass centre. One click, no Edit Mode, no 3D Cursor juggling. The geometry stays where it is.
 
----
+Built for architecture, interiors and exhibition work, where an origin at the floor, a corner or a wall face is the difference between "snap into place" and "nudge for a minute".
+
+<p align="center">
+  <img src="docs/points.gif" width="384" alt="Snap Points: 39 exact spots on a mesh">
+  <img src="docs/quick.gif" width="384" alt="Quick Snap: 3D Cursor and World Zero">
+</p>
 
 ## Features
 
-### 39 Snap Positions via Dropdown Menus
-Snap to any face, corner, edge midpoint, geometry extreme, or center which is grouped into Faces, Vertices, Edge Midpoints, and Centers dropdowns, plus Global Centers (Geometry, BBox, Mass) and Cursor / World Zero inline.
+- **Snap Points:** the origin goes to any of 39 points on the object.
+  - The six extreme sides: Top, Bottom, Left, Right, Front, Back.
+  - The 8 corners.
+  - The 12 edge midpoints.
+  - The face centres.
+  - The Geometry, Bounding-Box and Mass centres.
+- **Snap Source:**
+  - **Mesh** uses the real evaluated geometry, modifiers included. On a sphere, "Top" is the pole; on a roof, it is the ridge.
+  - **Bounding Box** uses the object's box.
+  - **3D Cursor** moves the origin to the cursor.
+- **Local or Global orientation, and a Front axis.** "Front" and "Left" mean the object's own front, not just −Y.
+- **Quick Snap:** the origin goes to the 3D Cursor or to World Zero.
+- **Alt+Q pie menu** with configurable slots, plus **Object ▸ Set Origin to...** and right-click menu entries.
+- **In-panel help:** a **?** on each panel plays a short animation of what it does.
+- **Works on many objects at once:** every selected mesh gets its own origin snapped.
+- **Greyed-out, not broken:** buttons that can't act on the selection (a curve, an empty, text) are greyed out, and their tooltip says why.
 
-### Origin → World Zero
-One button. Moves the origin to (0, 0, 0) with no modal, no options.
+Everything lives in the **Orivot** tab of the 3D Viewport sidebar (N).
 
-### Snap Reference Controls
-Set the snap source (Mesh / BBox / Cursor), world vs local orientation, and which local axis counts as "front", so the 39 positions calculate correctly for your workflow.
+<p align="center"><img src="docs/origin.gif" width="384" alt="Origin Snaps panel"></p>
 
-### Alt+Q Pie Menu
-8 quick snap positions accessible from anywhere in the viewport, no panel required.
+## Install
 
----
+Requires **Blender 4.5 LTS or newer**. Tested on 4.5 LTS, 5.0 and 5.2 LTS.
 
-## Installation
+1. Download `orivot_free-<version>.zip` from [Releases](../../releases). Don't unzip it.
+2. In Blender, open **Edit ▸ Preferences ▸ Get Extensions**, then choose **⌄ ▸ Install from Disk...** and pick the zip.
+3. Open the sidebar (N) in the 3D Viewport and go to the **Orivot** tab.
 
-1. Download **radix-1.0.0.zip** from [Releases](../../releases/latest)
-2. In Blender: **Edit → Preferences → Extensions → Install from Disk**
-3. Select the zip, then Radix Free appears in the **N-Panel → Radix Free** tab
+To install from source instead, zip the `orivot_free/` folder, or build it with Blender's extension tool:
 
-Requires **Blender 4.5 or later** (including Blender 5.x).
+```
+blender --command extension build --source-dir orivot_free --output-dir .
+```
 
----
+## Editions
 
-## Usage
+Orivot comes in three editions. Free is open source and stays free. Basic and Pro are paid and add the tools for production work.
 
-Open the **N-Panel** (press `N` in the 3D Viewport) and click the **Radix Free** tab.
-
-- **Snap Reference** | set snap source, orientation, and front axis
-- **Set Origin To** | the 4 dropdown groups + Global Centers + Cursor/World Zero
-- **Alt+Q** | quick-access pie menu from anywhere in the 3D Viewport
-
----
-
-## Radix Basic and Radix Pro
-
-Radix Free covers the core origin placement workflow. **[Radix Basic](https://discord.com/users/damagedarchitect)** and **[Radix Pro](https://discord.com/users/damagedarchitect)** add interactive snapping, a live viewport preview, and a full advanced placement suite.
-
-| Feature | Free | Basic | Pro |
+| | Free | Basic | Pro |
 |---|:---:|:---:|:---:|
-| 39 snap positions (dropdown menus) | ✓ | ✓ | ✓ |
-| Origin → World Zero | ✓ | ✓ | ✓ |
-| Global Centers (Geometry / BBox / Mass) | ✓ | ✓ | ✓ |
-| Alt+Q pie menu | ✓ | ✓ | ✓ |
-| Snap Reference controls | ✓ | ✓ | ✓ |
-| BBox handles + hover-enlarge | × | ✓ | ✓ |
-| Surface / Vertex / Grid / Cursor snap | × | ✓ | ✓ |
-| Viewport preview (highlight quad + arrow) | × | ✓ | ✓ |
-| Snap History (10-slot, auto-recorded) | × | ✓ | ✓ |
-| Surface modifier keys (Shift / Ctrl / Alt) | × | ✓ | ✓ |
-| Axis-locked surface snap (X / Y / Z) | × | ✓ | ✓ |
-| Numerical offset input while snapping | × | ✓ | ✓ |
-| Placement Tools (offsets, axis locks, live offset) | × | ✓ | ✓ |
-| Normal Offset | × | ✓ | ✓ |
-| Copy / Paste origin | × | ✓ | ✓ |
-| Multi-Object preview | × | ✓ | ✓ |
-| Edit Mode Snap | × | ✓ | ✓ |
-| Symmetry Origin / Batch Normalize | × | ✓ | ✓ |
-| Object Snap Tools | × | × | ✓ |
-| Snap History HUD overlay | × | × | ✓ |
-| Viewport Mode Indicator | × | × | ✓ |
-| Radix Place suite | × | × | ✓ |
-| → Pivot Library (8 named slots per object) | × | × | ✓ |
-| → Collision Preview (live bbox overlap) | × | × | ✓ |
-| → Surface Alignment (snap + rotate to normal) | × | × | ✓ |
-| → Smart + Batch Contact Detection | × | × | ✓ |
-| → Snap Layers (named setting presets) | × | × | ✓ |
-| → Chain / Distribute origins | × | × | ✓ |
+| 39 snap points, object centres, 3D Cursor, World Zero | ✓ | ✓ | ✓ |
+| Alt+Q pie menu, Object menu, in-panel help | ✓ | ✓ | ✓ |
+| Surface / Vertex snap (Alt+click on the mesh) | | ✓ | ✓ |
+| Clickable bounding-box handles | | ✓ | ✓ |
+| Live origin preview | | ✓ | ✓ |
+| Multi-Object (Individual / Combined; from the selection, a list or a collection) | | ✓ | ✓ |
+| Offset & Freeze, normal offset | | ✓ | ✓ |
+| Copy / Paste origin, Mirror Plane, Snap to Grid, Batch Normalize | | ✓ | ✓ |
+| Edit Mode selection snaps, snap history | | ✓ | ✓ |
+| Along Curve (start / middle / end / %, follow along, spline selection) | | | ✓ |
+| Origin Axes, Object Snaps, Place by Hover, Surface Align | | | ✓ |
+| Line Snap, Axis Transform, Collision, Chain, Scene Snap | | | ✓ |
+| Pivot Library, Saved Configurations, CSV import / export | | | ✓ |
+| Fabrication: cut files, nesting, assembly, datums | | | ✓ |
+| | **Free** | [**Get Basic**](https://discord.com/users/damagedarchitect) | [**Get Pro**](https://discord.com/users/damagedarchitect) |
 
-## Checkout what will you get in [Radix Pro](https://imgur.com/gallery/radix-pro-v3-1-0-ui-Se8iGiW)
-→ **[Get Radix Basic or Radix Pro on Discord](https://discord.com/users/damagedarchitect)**
----
+Install one edition at a time. They share tool names, so Blender refuses a second one with a message. Disable Free before you install Basic or Pro.
 
-## License
+Orivot Basic and Orivot Pro are available from the author: **[contact on Discord](https://discord.com/users/damagedarchitect)**.
 
-GNU General Public License v3.0 | see [LICENSE](LICENSE).
+## Coming from Radix Free or PivotForge Free?
 
----
+Orivot Free replaces both. Remove the old add-on before installing (Orivot uses the id `orivot_free`, so Blender treats it as a new add-on). The panel is now the **Orivot** tab. Clickable bounding-box handles moved to Orivot Basic.
+
+## Support
+
+- Bugs and requests: [Issues](../../issues). Include your Blender version and the steps to reproduce.
+- Contact: [Discord](https://discord.com/users/damagedarchitect) · cratercreativeconsultancy@gmail.com
+- Author: **DaMagedArchitect**, Crater Creative Consultancy L.L.C., Abu Dhabi.
 
 ## Contributing
 
-Bug reports and feature requests are welcome via [Issues](../../issues).
+Bug reports and feature requests are welcome via [Issues](../../issues). Pull requests are reviewed, but large feature additions go to the paid editions; small fixes, documentation and compatibility patches are the most likely to be merged.
 
-Pull requests are reviewed but may not always be merged, Radix Basic and Radix Pro are commercial products and significant feature additions are kept there. Small fixes, documentation improvements, and compatibility patches are the most likely to be accepted.
+## License
 
----
-
-*Made by [damagedarchitect](https://github.com/damagedarchitect) | Abu Dhabi, UAE*
+[GPL-3.0-or-later](LICENSE), like Blender itself. © 2026 Crater Creative Consultancy L.L.C.
