@@ -43,11 +43,7 @@ Requires **Blender 4.5 LTS or newer**. Tested on 4.5 LTS, 5.0 and 5.2 LTS.
 2. In Blender, open **Edit ▸ Preferences ▸ Get Extensions**, then choose **⌄ ▸ Install from Disk...** and pick the zip.
 3. Open the sidebar (N) in the 3D Viewport and go to the **Orivot** tab.
 
-To install from source instead, zip the `orivot_free/` folder, or build it with Blender's extension tool:
-
-```
-blender --command extension build --source-dir orivot_free --output-dir .
-```
+To install the latest source instead, use **Code ▸ Download ZIP** on this page and install that zip the same way.
 
 ## Editions
 
