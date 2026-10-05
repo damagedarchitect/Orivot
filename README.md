@@ -1,6 +1,5 @@
-<img width="1024" height="568" alt="image" src="https://github.com/user-attachments/assets/aebcd89c-42d1-4ff5-97e5-c508b4150fe8" />
-<img width="314" height="922" alt="image" src="https://github.com/user-attachments/assets/defeea72-ba43-4125-8918-428a6eb18a4e" />
-
+<img width="1709" height="983" alt="image" src="https://github.com/user-attachments/assets/e805a143-33bf-4ab1-a719-47634d524f67" />
+<img width="307" height="1259" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/1f48b48d-012e-4214-bc7f-f0a3a483c750" />
 
 # Orivot Free
 
@@ -76,9 +75,11 @@ Install one edition at a time. They share tool names, so Blender refuses a secon
 
 Orivot Basic and Orivot Pro are available from the author: **[contact on Discord](https://discord.com/users/damagedarchitect)**.
 
-## Coming from Radix Free or PivotForge Free?
-
-Orivot Free replaces both. Remove the old add-on before installing (Orivot uses the id `orivot_free`, so Blender treats it as a new add-on). The panel is now the **Orivot** tab. Clickable bounding-box handles moved to Orivot Basic.
+Orivot Pro provides production tools from snapping origins to objects to fabrication files for CNC cutting and more.
+With more tools in the Edit Mode that makes your modelling life easier:
+| Object Mode | Image 2 Title |
+| ------------- | ------------- |
+| ![Orivot Pro Object Mode](<img width="928" height="11703" alt="Orivot UI" src="https://github.com/user-attachments/assets/53be7b5b-f522-413f-880e-e4f82f159415" />) | ![Orivot Pro Edit Mode](<img width="928" height="7392" alt="Edit Mode" src="https://github.com/user-attachments/assets/4d409ac4-c261-4781-94f0-376ff3c31118" />) |
 
 ## Support
 
