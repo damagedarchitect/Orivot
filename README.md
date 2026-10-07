@@ -78,12 +78,20 @@ With more tools in the Edit Mode that makes your modelling life faster, precise 
 <table>
   <thead>
     <tr>
-      <th width="55%">Object Mode</th>
-      <th width="50%">Edit Mode</th>
+      <th width="50%">Orivot Basic Object Mode</th>
+      <th width="50%">Orivot Basic Edit Mode</th>
+      <th width="55%">Orivot Pro Object Mode</th>
+      <th width="50%">Orivot Pro Edit Mode</th>
     </tr>
   </thead>
   <tbody>
     <tr>
+      <td valign="top">
+        <img width="602" height="4032" alt="Orivot Basic UI Object Mode" src="https://github.com/user-attachments/assets/dde397e4-c44c-45fd-b165-cf9056a1bca8" />
+      </td>
+      <td valign="top">
+        <img width="602" height="1468" alt="Orivot Basic UI Edit Mode" src="https://github.com/user-attachments/assets/e9a17682-2636-4386-a672-f6d17933286c" />
+      </td>
       <td valign="top">
         <img width="928" height="11951" alt="Orivot Pro UI Object Mode" src="https://github.com/user-attachments/assets/81d886fb-24db-48c5-936f-48f19c585c86" />
       </td>
