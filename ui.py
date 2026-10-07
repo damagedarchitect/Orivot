@@ -38,12 +38,47 @@ def _mesh_active(context):
 # Base classes
 # ──────────────────────────────────────────────────────────────────────────────
 
+_ICONS = None
+
+
+def icon(name):
+    """`name` if this Blender has that built-in icon, else 'NONE'. A wrong icon name makes
+    the whole panel header fail to draw, and icons do get renamed between versions."""
+    global _ICONS
+    if _ICONS is None:
+        _ICONS = set(bpy.types.UILayout.bl_rna.functions["label"]
+                     .parameters["icon"].enum_items.keys())
+    return name if name in _ICONS else 'NONE'
+
+
+def _header_icon(self, context):
+    self.layout.label(text="", icon=icon(self.orivot_icon))
+
+
+# One built-in icon per tool section, so the long collapsed list reads by shape. Panels
+# defined in other modules (Line Snap, Axis Transform, Fab) get theirs in attach_help().
+EXTERNAL_ICONS = {
+    "VIEW3D_PT_orivot_linesnap": 'SNAP_EDGE',
+    "VIEW3D_PT_orivot_linesnap_quick": 'SNAP_MIDPOINT',
+    "VIEW3D_PT_orivot_axis": 'EMPTY_AXIS',
+    "VIEW3D_PT_orivot_fab_production": 'MESH_GRID',
+    "VIEW3D_PT_orivot_fab_output": 'EXPORT',
+    "VIEW3D_PT_orivot_fab_assembly": 'LINKED',
+    "VIEW3D_PT_orivot_fab_datums": 'TRANSFORM_ORIGINS',
+}
+
+
 class _Panel:
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = CATEGORY
     help_id = None
     modes = None            # None = any mode, else a set of context.mode values
+    orivot_icon = None      # built-in icon shown before the panel name
+
+    def draw_header(self, context):
+        if self.orivot_icon:
+            _header_icon(self, context)
 
     @classmethod
     def poll(cls, context):
@@ -107,6 +142,7 @@ class VIEW3D_PT_orivot_origin(_Panel, bpy.types.Panel):
 
 class VIEW3D_PT_orivot_quick(_Panel, bpy.types.Panel):
     bl_label = "Quick Snap"
+    orivot_icon = 'PIVOT_CURSOR'
     bl_parent_id = "VIEW3D_PT_orivot_origin"
     help_id = "quick"
     modes = _OBJ
@@ -129,6 +165,7 @@ def _op(row, text, mode):
 
 class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
     bl_label = "Snap Points"
+    orivot_icon = 'SNAP_VERTEX'
     bl_parent_id = "VIEW3D_PT_orivot_origin"
     help_id = "points"
     modes = _OBJ
@@ -198,11 +235,22 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
 # SETTINGS
 # ══════════════════════════════════════════════════════════════════════════════
 
+def upgrade_buttons(layout):
+    """Free only: one full-width row of heart buttons, the last line of the Settings panel
+    (a panel of its own would bring a collapse arrow, or sit at the top without a header).
+    Basic gets a small heart on the Help Buttons row instead. What each edition adds is in
+    the tooltips (ORIVOT_OT_open_upgrade.description)."""
+    layout.separator()
+    row = layout.row(align=True)
+    row.operator("orivot.open_upgrade", text="Basic", icon=icon('FUND')).edition = 'BASIC'
+    row.operator("orivot.open_upgrade", text="Pro", icon=icon('FUND')).edition = 'PRO'
+
+
 class VIEW3D_PT_orivot_settings(_Panel, bpy.types.Panel):
     bl_label = "Settings"
     bl_idname = "VIEW3D_PT_orivot_settings"
     bl_order = 3
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = (set())
 
     def draw_header(self, context):
         self.layout.label(text="", icon='PREFERENCES')
@@ -211,41 +259,16 @@ class VIEW3D_PT_orivot_settings(_Panel, bpy.types.Panel):
         r = self.layout.row(align=True)
         r.operator("orivot.show_shortcuts_info", text="Shortcuts", icon='EVENT_ALT')
         r.operator("preferences.addon_show", text="Defaults", icon='PREFERENCES').module = __package__
+        row = self.layout.row(align=True)
         try:
             prefs = context.preferences.addons[__package__].preferences
-            self.layout.prop(prefs, "show_help_buttons", icon='QUESTION')
+            row.prop(prefs, "show_help_buttons", icon='QUESTION')
         except Exception:
             pass
         col = self.layout.column(align=True)
         col.prop(context.scene, "orivot_flip_left_right", text="Swap Left / Right labels")
         col.prop(context.scene, "orivot_show_mode_indicator", text="Mode indicator in viewport")
-
-
-class VIEW3D_PT_orivot_upgrade(_Panel, bpy.types.Panel):
-    """Free / Basic only: what the next edition adds, and where to get it."""
-    bl_label = "More Tools"
-    bl_idname = "VIEW3D_PT_orivot_upgrade"
-    bl_order = 4
-    bl_options = {'DEFAULT_CLOSED'}
-
-    def draw_header(self, context):
-        self.layout.label(text="", icon='PLUS')
-
-    def body(self, context):
-        col = self.layout.column(align=True)
-        col.label(text="Orivot Basic adds:", icon='ADD')
-        for t in ("Surface / Vertex snap and Alt+click", "Clickable bounding-box handles",
-                  "Live preview of the next snap", "Multi-Object, Offset & Freeze",
-                  "Copy / Paste origin, Mirror Plane", "Edit Mode selection snaps, history"):
-            col.label(text="   " + t)
-        col.operator("orivot.open_upgrade", text="Get Orivot Basic", icon='URL').edition = 'BASIC'
-        col.separator()
-        col.label(text="Orivot Pro adds:", icon='ADD')
-        for t in ("Along Curve, Origin Axes, Pivot Library", "Object Snaps: snap, drop, align, rotate",
-                  "Line Snap and Axis Transform (Edit Mode)", "Collision check, Chain / Distribute",
-                  "Saved Configurations, CSV export", "Fabrication: CNC cut files, nesting"):
-            col.label(text="   " + t)
-        col.operator("orivot.open_upgrade", text="Get Orivot Pro", icon='URL').edition = 'PRO'
+        upgrade_buttons(self.layout)
 
 
 ORIGIN_PANELS = (VIEW3D_PT_orivot_origin, VIEW3D_PT_orivot_quick, VIEW3D_PT_orivot_points)
@@ -257,7 +280,7 @@ _FREE = {VIEW3D_PT_orivot_origin, VIEW3D_PT_orivot_quick, VIEW3D_PT_orivot_point
          VIEW3D_PT_orivot_settings}
 _BASIC = _FREE | set()
 _ALL = ORIGIN_PANELS + OBJECT_PANELS + SETTINGS_PANELS
-CLASSES = tuple(c for c in _ALL if c in ((_FREE))) + (VIEW3D_PT_orivot_upgrade,)
+CLASSES = tuple(c for c in _ALL if c in ((_FREE)))
 
 
 def attach_help():
@@ -277,6 +300,14 @@ def attach_help():
                   (ops.VIEW3D_PT_orivot_fab_datums, "fab_datums")]
     for cls, topic in pairs:
         _help.attach(cls, topic)
+    extra = []
+    if getattr(P, "linesnap", None) is not None:
+        extra.append(P.linesnap.VIEW3D_PT_orivot_linesnap_quick)
+    for cls in [c for c, _ in pairs] + extra:
+        ic = EXTERNAL_ICONS.get(cls.__name__)
+        if ic and "draw_header" not in cls.__dict__:
+            cls.orivot_icon = ic
+            cls.draw_header = _header_icon
 
 
 def register():
