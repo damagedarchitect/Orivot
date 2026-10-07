@@ -72,35 +72,39 @@ Install one edition at a time. They share tool names, so Blender refuses a secon
 
 Orivot Basic and Orivot Pro are available from the author: **[contact on Discord](https://discord.com/users/damagedarchitect)**.
 
-Orivot Pro provides production tools from snapping origins to objects to fabrication files for CNC cutting and more.
-With more tools in the Edit Mode that makes your modelling life faster, precise and easier:
+## Screenshots
 
+Orivot Pro adds production tools, from snapping origins to objects up to fabrication files for CNC cutting, plus Edit Mode tools that make modelling faster and more precise. Click any image to open it at full size.
+
+<details>
+<summary><b>Orivot Basic</b>: Object Mode and Edit Mode</summary>
+<br>
 <table>
-  <thead>
-    <tr>
-      <th width="50%">Orivot Basic Object Mode</th>
-      <th width="50%">Orivot Basic Edit Mode</th>
-      <th width="55%">Orivot Pro Object Mode</th>
-      <th width="50%">Orivot Pro Edit Mode</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td valign="top">
-        <img width="602" height="4032" alt="Orivot Basic UI Object Mode" src="https://github.com/user-attachments/assets/dde397e4-c44c-45fd-b165-cf9056a1bca8" />
-      </td>
-      <td valign="top">
-        <img width="602" height="1468" alt="Orivot Basic UI Edit Mode" src="https://github.com/user-attachments/assets/e9a17682-2636-4386-a672-f6d17933286c" />
-      </td>
-      <td valign="top">
-        <img width="928" height="11951" alt="Orivot Pro UI Object Mode" src="https://github.com/user-attachments/assets/81d886fb-24db-48c5-936f-48f19c585c86" />
-      </td>
-      <td valign="top">
-        <img width="928" height="7742" alt="Orivot Pro UI Edit Mode" src="https://github.com/user-attachments/assets/228d594d-a6fa-4033-980e-5fd11d2872f2" />
-      </td>
-    </tr>
-  </tbody>
+<tr>
+<th>Object Mode</th>
+<th>Edit Mode</th>
+</tr>
+<tr>
+<td valign="top"><img width="400" alt="Orivot Basic UI Object Mode" src="https://github.com/user-attachments/assets/dde397e4-c44c-45fd-b165-cf9056a1bca8" /></td>
+<td valign="top"><img width="400" alt="Orivot Basic UI Edit Mode" src="https://github.com/user-attachments/assets/e9a17682-2636-4386-a672-f6d17933286c" /></td>
+</tr>
 </table>
+</details>
+
+<details>
+<summary><b>Orivot Pro</b>: Object Mode and Edit Mode</summary>
+<br>
+<table>
+<tr>
+<th>Object Mode</th>
+<th>Edit Mode</th>
+</tr>
+<tr>
+<td valign="top"><img width="400" alt="Orivot Pro UI Object Mode" src="https://github.com/user-attachments/assets/81d886fb-24db-48c5-936f-48f19c585c86" /></td>
+<td valign="top"><img width="400" alt="Orivot Pro UI Edit Mode" src="https://github.com/user-attachments/assets/228d594d-a6fa-4033-980e-5fd11d2872f2" /></td>
+</tr>
+</table>
+</details>
 
 ## Support
 
