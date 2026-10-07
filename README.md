@@ -78,8 +78,8 @@ With more tools in the Edit Mode that makes your modelling life faster, precise 
 <table>
   <thead>
     <tr>
-      <th width="70%">Object Mode</th>
-      <th width="50%">Edit Mode</th>
+      <th width="55%">Object Mode</th>
+      <th width="55%">Edit Mode</th>
     </tr>
   </thead>
   <tbody>
