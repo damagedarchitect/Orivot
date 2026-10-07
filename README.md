@@ -1,5 +1,6 @@
 <img width="1709" height="983" alt="image" src="https://github.com/user-attachments/assets/e805a143-33bf-4ab1-a719-47634d524f67" />
-<img width="307" height="1259" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/1f48b48d-012e-4214-bc7f-f0a3a483c750" />
+<img width="419" height="1367" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/ccbb8f1b-8c04-452f-8011-8e0ba6e4e722" />
+
 
 # Orivot Free
 
@@ -84,10 +85,10 @@ With more tools in the Edit Mode that makes your modelling life faster, precise 
   <tbody>
     <tr>
       <td valign="top">
-        <img src="https://github.com/user-attachments/assets/04b0e6d0-803f-44fa-b316-c61b93b5cbe6" />
+        <img width="928" height="11951" alt="Orivot Pro UI Object Mode" src="https://github.com/user-attachments/assets/81d886fb-24db-48c5-936f-48f19c585c86" />
       </td>
       <td valign="top">
-        <img src="https://github.com/user-attachments/assets/ad83dedc-c85d-4eab-829e-f64426094ad0" />
+        <img width="928" height="7742" alt="Orivot Pro UI Edit Mode" src="https://github.com/user-attachments/assets/228d594d-a6fa-4033-980e-5fd11d2872f2" />
       </td>
     </tr>
   </tbody>
