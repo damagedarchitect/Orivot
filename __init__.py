@@ -4,7 +4,7 @@ bl_info = {
     "category": "Object",
     "description": ("Origin snapping to 39 exact points on any mesh: extreme sides, corners, edge midpoints, face centres and geometry / bounding-box / mass centres, plus 3D Cursor, World Zero and an Alt+Q pie menu."),
     "author": "DaMagedArchitect",
-    "version": (4, 2, 4),
+    "version": (4, 2, 5),
     "doc_url": "https://discord.com/users/damagedarchitect",
     "tracker_url": "https://discord.com/users/damagedarchitect",
 }
@@ -2823,6 +2823,24 @@ class ORIVOT_OT_open_upgrade(bpy.types.Operator):
 
     edition: bpy.props.EnumProperty(items=[('BASIC', "Basic", ""), ('PRO', "Pro", "")],
                                     default='PRO', options={'SKIP_SAVE'})
+
+    @classmethod
+    def description(cls, context, properties):
+        if properties.edition == 'BASIC':
+            return ("Orivot Basic adds:\n"
+                    "\u2022 Surface / Vertex snap (Alt+click on the mesh)\n"
+                    "\u2022 Clickable bounding-box handles\n"
+                    "\u2022 Live preview of the next snap\n"
+                    "\u2022 Multi-Object, Offset & Freeze\n"
+                    "\u2022 Copy / Paste origin, Mirror Plane, Snap to Grid\n"
+                    "\u2022 Edit Mode selection snaps, snap history")
+        return ((("Orivot Pro adds everything in Basic, plus:\n")) +
+                "\u2022 Along Curve, Origin Axes, Pivot Library\n"
+                "\u2022 Object Snaps: snap, drop, align, rotate\n"
+                "\u2022 Line Snap and Axis Transform (Edit Mode)\n"
+                "\u2022 Collision check, Chain / Distribute\n"
+                "\u2022 Saved Configurations, CSV export\n"
+                "\u2022 Fabrication: CNC cut files, nesting, assembly")
 
     def execute(self, context):
         bpy.ops.wm.url_open(url=tier.URL_BASIC if self.edition == 'BASIC' else tier.URL_PRO)
