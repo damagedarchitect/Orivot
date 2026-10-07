@@ -1,5 +1,11 @@
 # Changelog — Orivot Free
 
+## 4.2.5
+
+- **Section icons.** Quick Snap and Snap Points now show an icon in their header, like Origin Snaps and Settings, so the panel list reads at a glance. Only Blender's own icons are used, and each name is checked against the running Blender, so an icon renamed in a future version shows nothing instead of breaking the panel.
+- **Smaller upgrade advert.** The 16-line "More Tools" panel is gone. Settings ends with one row of two heart buttons, ❤ Basic and ❤ Pro; hover either one to see what that edition adds. Settings now opens by default.
+- **Tested live in Blender 5.2.2** (every button on five selection cases, with the sidebar redrawn after each) and headless on 4.5 LTS, 5.0 and 5.2 LTS. No errors.
+
 ## 4.2.4
 
 - **Buttons that can't act are greyed out**, with the reason in their tooltip, instead of failing when clicked. This covers Snap Points and the 3D Cursor snap when a curve, text or empty is active or selected. World Zero stays available.
