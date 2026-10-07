@@ -66,7 +66,9 @@ Orivot comes in three editions. Free is open source and stays free. Basic and Pr
 | Line Snap, Axis Transform, Collision, Chain, Scene Snap | | | ✓ |
 | Pivot Library, Saved Configurations, CSV import / export | | | ✓ |
 | Fabrication: cut files, nesting, assembly, datums | | | ✓ |
-| | **Free** | [**Get Basic**](https://discord.com/users/damagedarchitect) | [**Get Pro**](https://discord.com/users/damagedarchitect) |
+| | **Free** | [**Basic · $15 / AED 55**](https://discord.com/users/damagedarchitect) | [**Pro · $39 / AED 145** for the first 30 days](https://discord.com/users/damagedarchitect) |
+
+**How to buy Basic or Pro:** message me on [Discord](https://discord.com/users/damagedarchitect) with the edition you want. I'll send a secure card payment link (Ziina, AED), and the add-on and the user manual arrive on Discord right after payment. One-time purchase, updates within the 4.x line included.
 
 Install one edition at a time. They share tool names, so Blender refuses a second one with a message. Disable Free before you install Basic or Pro.
 
