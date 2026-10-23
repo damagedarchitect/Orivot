@@ -53,6 +53,7 @@ except ImportError:
 from . import common
 from . import preview
 from . import op_tools
+from . import op_handles
 from . import prefs
 from . import support
 
@@ -271,7 +272,7 @@ def _register_props():
         default=False,
         description="Show snap handles on the active object's bounding box. While on, click a "
                     "handle to move the origin there; Esc or clicking again turns them off",
-        update=op_tools._handles_toggle_update,
+        update=op_handles._handles_toggle_update,
     )
     bpy.types.Scene.orivot_handles_stay_on = bpy.props.BoolProperty(
         name="Keep Handles On",

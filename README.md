@@ -75,7 +75,14 @@ Launch prices last until 31 Dec 2026. An upgrade costs the difference between th
 
 Install one edition at a time. They share tool names, so Blender refuses a second one with a message. Disable the one you have before you install another.
 
-Orivot Pro adds object snapping, layout planning (grids, clearances, distribute, relations, frames) and live measuring; Orivot Fabricator adds drawings, schedules and CNC cut files. Both bring Edit Mode tools that make modelling faster and more precise:
+Orivot Pro adds object snapping, layout planning (grids, clearances, distribute, relations, frames) and live measuring; Orivot Fabricator adds drawings, schedules and CNC cut files. Both bring Edit Mode tools that make modelling faster and more precise.
+
+### The sidebar of every edition
+
+Every panel open, Object Mode and Edit Mode. Click an edition to see it.
+
+<details>
+<summary><b>Orivot Fabricator</b>: everything, including cut files, drawings and schedules</summary>
 
 <table>
   <thead>
@@ -86,15 +93,69 @@ Orivot Pro adds object snapping, layout planning (grids, clearances, distribute,
   </thead>
   <tbody>
     <tr>
-      <td valign="top">
-        <img src="https://github.com/user-attachments/assets/04b0e6d0-803f-44fa-b316-c61b93b5cbe6" />
-      </td>
-      <td valign="top">
-        <img src="https://github.com/user-attachments/assets/ad83dedc-c85d-4eab-829e-f64426094ad0" />
-      </td>
+      <td valign="top"><img src="docs/ui/fabricator_object.png" alt="Orivot Fabricator, Object Mode sidebar" /></td>
+      <td valign="top"><img src="docs/ui/fabricator_edit.png" alt="Orivot Fabricator, Edit Mode sidebar" /></td>
     </tr>
   </tbody>
 </table>
+</details>
+
+<details>
+<summary><b>Orivot Pro</b>: design and layout tools</summary>
+
+<table>
+  <thead>
+    <tr>
+      <th width="50%">Object Mode</th>
+      <th width="50%">Edit Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top"><img src="docs/ui/pro_object.png" alt="Orivot Pro, Object Mode sidebar" /></td>
+      <td valign="top"><img src="docs/ui/pro_edit.png" alt="Orivot Pro, Edit Mode sidebar" /></td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+<summary><b>Orivot Basic</b>: snapping, handles, Multi-Object, 3D Cursor, 3D Print, Scene Health</summary>
+
+<table>
+  <thead>
+    <tr>
+      <th width="50%">Object Mode</th>
+      <th width="50%">Edit Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top"><img src="docs/ui/basic_object.png" alt="Orivot Basic, Object Mode sidebar" /></td>
+      <td valign="top"><img src="docs/ui/basic_edit.png" alt="Orivot Basic, Edit Mode sidebar" /></td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+<summary><b>Orivot Free</b>: 39 snap points, Quick Snap, pie menu</summary>
+
+<table>
+  <thead>
+    <tr>
+      <th width="50%">Object Mode</th>
+      <th width="50%">Edit Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top"><img src="docs/ui/free_object.png" alt="Orivot Free, Object Mode sidebar" /></td>
+      <td valign="top"><img src="docs/ui/free_edit.png" alt="Orivot Free, Edit Mode sidebar" /></td>
+    </tr>
+  </tbody>
+</table>
+</details>
 
 ## Support
 

@@ -11,6 +11,7 @@ Orivot is now four editions: Free, Basic, Pro and the new Fabricator. Free stays
 - **Upgrade buttons:** Settings ends with Basic | Pro | Fabricator buttons; hover one to see what it adds and its price.
 - Under the hood: the 9.5k-line `__init__.py` is split into modules, and every caught error is recorded for Report a Problem.
 - **Tested live in Blender 5.2.2** (every button on five selection cases, the redraws, undo) and headless on 4.5 LTS and 5.2 LTS. No errors.
+- **Rebuilt 23 Oct (same version):** the add-on's icon collection is freed when it is empty (it was left behind on disable); moving a curve's origin no longer records a false error in Report a Problem; the operator code is split further by area. The tests now also fail on any error Orivot catches and records itself. Screenshots of every edition's sidebar are in the README.
 
 ## 4.2.5
 

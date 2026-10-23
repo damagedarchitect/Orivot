@@ -124,14 +124,15 @@ def _transform_data(data, D):
         data.transform(D, shape_keys=True)
     except TypeError:                       # very old signature without shape_keys
         data.transform(D)
+    # Mesh has update(); Curve / Lattice / Armature only update_tag(). Calling update() on
+    # a curve raised every time and filled Report a Problem with a false error.
     try:
-        data.update()
+        if hasattr(data, "update"):
+            data.update()
+        else:
+            data.update_tag()
     except Exception as _exc:
         support.note(_exc)
-        try:
-            data.update_tag()
-        except Exception as _exc:
-            support.note(_exc)
 
 
 def _compensate_user(u, Dinv, translation_only):

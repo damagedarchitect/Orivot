@@ -159,10 +159,14 @@ from . import state
 from . import common
 from . import preview
 from . import op_origin
+from . import op_preview
+from . import op_multi
 from . import op_surface
 from . import op_objsnap
 from . import pie
 from . import op_tools
+from . import op_handles
+from . import op_offsets
 from . import menus
 from . import prefs
 from . import place
@@ -198,7 +202,8 @@ from . import support
 from . import icons
 
 
-_SPLIT = (state, common, preview, op_origin, op_surface, op_objsnap, pie, op_tools, menus, prefs, place, props)
+_SPLIT = (state, common, preview, op_origin, op_preview, op_multi, op_surface, op_objsnap, pie,
+          op_tools, op_handles, op_offsets, menus, prefs, place, props)
 
 
 def __getattr__(name):
@@ -349,12 +354,12 @@ def _on_load_post(*args):
     # Clear Orivot Place transient state
     place.clear_snap_history()
     common._handle_hover_world_pos[0] = None
-    op_tools._handle_mode["running"] = False     # modal handlers do not survive a file load
-    op_tools._drop_oneshot_handle_draw()
-    op_tools._handle_mode["stop"] = False
+    op_handles._handle_mode["running"] = False     # modal handlers do not survive a file load
+    op_handles._drop_oneshot_handle_draw()
+    op_handles._handle_mode["stop"] = False
     try:
         if getattr(bpy.context.scene, 'orivot_show_viewport_handles', False):
-            bpy.app.timers.register(op_tools._start_handle_mode, first_interval=0.2)
+            bpy.app.timers.register(op_handles._start_handle_mode, first_interval=0.2)
     except Exception as _exc:
         support.note(_exc)
     common._history_hud_text[0]      = None
@@ -515,18 +520,18 @@ def register():
 
 
 def unregister():
-    if op_tools._handle_mode["running"]:
+    if op_handles._handle_mode["running"]:
         # the Handles modal dies with the add-on and never runs its cleanup: clear its
         # status-bar hint ourselves (it stayed until another tool replaced it)
         try:
             bpy.context.workspace.status_text_set(None)
         except Exception as _exc:
             support.note(_exc)
-    op_tools._handle_mode["stop"] = True
-    op_tools._drop_oneshot_handle_draw()
+    op_handles._handle_mode["stop"] = True
+    op_handles._drop_oneshot_handle_draw()
     try:
-        if bpy.app.timers.is_registered(op_tools._start_handle_mode):
-            bpy.app.timers.unregister(op_tools._start_handle_mode)
+        if bpy.app.timers.is_registered(op_handles._start_handle_mode):
+            bpy.app.timers.unregister(op_handles._start_handle_mode)
     except Exception as _exc:
         support.note(_exc)
     bpy.app.driver_namespace.pop("_orivot_active_tier", None)
@@ -647,8 +652,8 @@ def unregister():
     except Exception as _exc:
         support.note(_exc)
     for _lst in (bpy.app.handlers.undo_post, bpy.app.handlers.redo_post):
-        if op_tools._handles_after_undo in _lst:
-            _lst.remove(op_tools._handles_after_undo)
+        if op_handles._handles_after_undo in _lst:
+            _lst.remove(op_handles._handles_after_undo)
 
     props._unregister_props()
 

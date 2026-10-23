@@ -1,65 +1,15 @@
-"""Origin snap operator (39 points) plus preview / colour / Multi-Object operators.
+"""The 39-point origin snap operator (Set Origin: sides, corners, edges, centres).
 
-Split out of __init__.py in 4.3 (tools/split_init.py)."""
+Split out of __init__.py in 4.3 (tools/split_init.py), then by area (tools/split_ops.py)."""
 
-import sys
 import bpy
-from mathutils import Vector, Matrix
-from gpu_extras.batch import batch_for_shader
-import math
-from bpy.app.handlers import persistent
-from bpy_extras.view3d_utils import (
-    region_2d_to_vector_3d,
-    region_2d_to_origin_3d,
-    location_3d_to_region_2d,
-)
-
+from mathutils import Vector
 from . import meshnp
 from . import tier
 from . import state
-try:
-    from . import linesnap
-except ImportError:
-    linesnap = None
-try:
-    from . import axistransform
-except ImportError:
-    axistransform = None
-try:
-    from . import chain
-except ImportError:
-    chain = None
-try:
-    from . import collision
-except ImportError:
-    collision = None
-try:
-    from . import scenesnap
-except ImportError:
-    scenesnap = None
-try:
-    from . import curvepath
-except ImportError:
-    curvepath = None
-try:
-    from . import panelscroll
-except ImportError:
-    panelscroll = None
-try:
-    from . import fab
-except ImportError:
-    fab = None
-try:
-    from . import orient
-except ImportError:
-    orient = None
 from . import common
 from . import preview
 from . import support
-
-
-def _pkg():
-    return sys.modules[__package__]
 
 
 class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
@@ -676,6 +626,3 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
             words = " ".join([names[rest[0]], names[rest[1]], "Front" if rest[2] == 'F' else "Back"])
         return {'VERT': "Corner", 'EDGE': "Edge Midpoint", 'CENTER': "Face Centre"}.get(kind, "Snap") + \
             (f" {words}" if words else "")
-
-
-# ---------------- Supporting Operators ----------------

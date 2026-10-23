@@ -47,7 +47,8 @@ def register():
 
 def unregister():
     global _pcoll
-    if _pcoll:
+    # an empty collection is falsy (len 0) but must still be freed (it subclasses dict)
+    if _pcoll is not None and type(_pcoll) is not dict:     # {} = the load failed
         try:
             bpy.utils.previews.remove(_pcoll)
         except Exception:
