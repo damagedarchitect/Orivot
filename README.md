@@ -1,5 +1,4 @@
 <img width="1709" height="983" alt="image" src="https://github.com/user-attachments/assets/e805a143-33bf-4ab1-a719-47634d524f67" />
-<img width="307" height="1259" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/1f48b48d-012e-4214-bc7f-f0a3a483c750" />
 
 # Orivot Free
 
