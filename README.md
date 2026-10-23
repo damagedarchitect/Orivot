@@ -1,6 +1,5 @@
 <img width="1709" height="983" alt="image" src="https://github.com/user-attachments/assets/e805a143-33bf-4ab1-a719-47634d524f67" />
-<img width="419" height="1367" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/ccbb8f1b-8c04-452f-8011-8e0ba6e4e722" />
-
+<img width="307" height="1259" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/1f48b48d-012e-4214-bc7f-f0a3a483c750" />
 
 # Orivot Free
 
@@ -38,75 +37,64 @@ Everything lives in the **Orivot** tab of the 3D Viewport sidebar (N).
 
 ## Install
 
-Requires **Blender 4.5 LTS or newer**. Tested on 4.5 LTS, 5.0 and 5.2 LTS.
+Requires **Blender 4.5 LTS or newer**. Tested on 4.5 LTS and 5.2 LTS.
 
 1. Download `orivot_free-<version>.zip` from [Releases](../../releases). Don't unzip it.
 2. In Blender, open **Edit ▸ Preferences ▸ Get Extensions**, then choose **⌄ ▸ Install from Disk...** and pick the zip.
 3. Open the sidebar (N) in the 3D Viewport and go to the **Orivot** tab.
 
-To install the latest source instead, use **Code ▸ Download ZIP** on this page and install that zip the same way.
+To install from source instead, zip the `orivot_free/` folder, or build it with Blender's extension tool:
+
+```
+blender --command extension build --source-dir orivot_free --output-dir .
+```
 
 ## Editions
 
-Orivot comes in three editions. Free is open source and stays free. Basic and Pro are paid and add the tools for production work.
+Orivot comes in four editions. Each one contains everything in the edition below it.
 
-| | Free | Basic | Pro |
-|---|:---:|:---:|:---:|
-| 39 snap points, object centres, 3D Cursor, World Zero | ✓ | ✓ | ✓ |
-| Alt+Q pie menu, Object menu, in-panel help | ✓ | ✓ | ✓ |
-| Surface / Vertex snap (Alt+click on the mesh) | | ✓ | ✓ |
-| Clickable bounding-box handles | | ✓ | ✓ |
-| Live origin preview | | ✓ | ✓ |
-| Multi-Object (Individual / Combined; from the selection, a list or a collection) | | ✓ | ✓ |
-| Offset & Freeze, normal offset | | ✓ | ✓ |
-| Copy / Paste origin, Mirror Plane, Snap to Grid, Batch Normalize | | ✓ | ✓ |
-| Edit Mode selection snaps, snap history | | ✓ | ✓ |
-| Along Curve (start / middle / end / %, follow along, spline selection) | | | ✓ |
-| Origin Axes, Object Snaps, Place by Hover, Surface Align | | | ✓ |
-| Line Snap, Axis Transform, Collision, Chain, Scene Snap | | | ✓ |
-| Pivot Library, Saved Configurations, CSV import / export | | | ✓ |
-| Fabrication: cut files, nesting, assembly, datums | | | ✓ |
-| | **Free** | [**Basic · $15 / AED 55**](https://discord.com/users/damagedarchitect) | [**Pro · $39 / AED 145** for the first 30 days](https://discord.com/users/damagedarchitect) |
+| | **Free** | **Basic** | **Pro** | **Fabricator** |
+|---|:-:|:-:|:-:|:-:|
+| 39 snap points, centres, 3D Cursor / World Zero, Alt+Q pie | ✔ | ✔ | ✔ | ✔ |
+| Surface / vertex snapping, handles, Multi-Object, offsets, copy / paste | | ✔ | ✔ | ✔ |
+| 3D Cursor panel: object to cursor, cursor to box points | | ✔ | ✔ | ✔ |
+| 3D Print: orient, drop to bed, batch STL | | ✔ | ✔ | ✔ |
+| Scene Health report, instance offsets, use-case presets | | ✔ | ✔ | ✔ |
+| Object Snaps, Line Snap, Axis Transform, collision check | | | ✔ | ✔ |
+| Measure: sizes, gaps, areas, volume, viewport dimensions | | | ✔ | ✔ |
+| Grids & Levels, Clearances, Smart Distribute, Relations | | | ✔ | ✔ |
+| Frames & Trusses, Site Rebase, Import Cleanup, Save as Asset | | | ✔ | ✔ |
+| CNC cut files: nesting, kerf, dogbones, cut lists (DXF / SVG) | | | | ✔ |
+| Drawings: plan / elevation / section with dimensions (DXF / SVG / PDF) | | | | ✔ |
+| Schedules: areas, materials, lengths, board order (XLSX / CSV) | | | | ✔ |
+| **Price** | free | AED 55 (~$15) | AED 145 (~$39)<br>launch **AED 125 (~$35)** | AED 239 (~$65)<br>launch **AED 185 (~$50)** |
 
-**How to buy Basic or Pro:** message me on [Discord](https://discord.com/users/damagedarchitect) with the edition you want. I'll send a secure card payment link (Ziina, AED), and the add-on and the user manual arrive on Discord right after payment. One-time purchase, updates within the 4.x line included.
+Launch prices last until 31 Dec 2026. An upgrade costs the difference between the two prices. Owners of 4.2.5 Pro get Fabricator.
 
-Install one edition at a time. They share tool names, so Blender refuses a second one with a message. Disable Free before you install Basic or Pro.
+**To buy:** message on [Discord](https://discord.com/users/damagedarchitect). You pay with the Ziina payment link and the zip is delivered on Discord.
 
-Orivot Basic and Orivot Pro are available from the author: **[contact on Discord](https://discord.com/users/damagedarchitect)**.
+Install one edition at a time. They share tool names, so Blender refuses a second one with a message. Disable the one you have before you install another.
 
-## Screenshots
+Orivot Pro adds object snapping, layout planning (grids, clearances, distribute, relations, frames) and live measuring; Orivot Fabricator adds drawings, schedules and CNC cut files. Both bring Edit Mode tools that make modelling faster and more precise:
 
-Orivot Pro adds production tools, from snapping origins to objects up to fabrication files for CNC cutting, plus Edit Mode tools that make modelling faster and more precise. Click any image to open it at full size.
-
-<details>
-<summary><b>Orivot Basic</b>: Object Mode and Edit Mode</summary>
-<br>
 <table>
-<tr>
-<th>Object Mode</th>
-<th>Edit Mode</th>
-</tr>
-<tr>
-<td valign="top"><img width="400" alt="Orivot Basic UI Object Mode" src="https://github.com/user-attachments/assets/dde397e4-c44c-45fd-b165-cf9056a1bca8" /></td>
-<td valign="top"><img width="400" alt="Orivot Basic UI Edit Mode" src="https://github.com/user-attachments/assets/e9a17682-2636-4386-a672-f6d17933286c" /></td>
-</tr>
+  <thead>
+    <tr>
+      <th width="50%">Object Mode</th>
+      <th width="50%">Edit Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top">
+        <img src="https://github.com/user-attachments/assets/04b0e6d0-803f-44fa-b316-c61b93b5cbe6" />
+      </td>
+      <td valign="top">
+        <img src="https://github.com/user-attachments/assets/ad83dedc-c85d-4eab-829e-f64426094ad0" />
+      </td>
+    </tr>
+  </tbody>
 </table>
-</details>
-
-<details>
-<summary><b>Orivot Pro</b>: Object Mode and Edit Mode</summary>
-<br>
-<table>
-<tr>
-<th>Object Mode</th>
-<th>Edit Mode</th>
-</tr>
-<tr>
-<td valign="top"><img width="400" alt="Orivot Pro UI Object Mode" src="https://github.com/user-attachments/assets/81d886fb-24db-48c5-936f-48f19c585c86" /></td>
-<td valign="top"><img width="400" alt="Orivot Pro UI Edit Mode" src="https://github.com/user-attachments/assets/228d594d-a6fa-4033-980e-5fd11d2872f2" /></td>
-</tr>
-</table>
-</details>
 
 ## Support
 

@@ -2,7 +2,7 @@ schema_version = "1.0.0"
 
 # ── Identity ──────────────────────────────────────────────────────────────────
 id = "orivot_free"
-version = "4.2.5"
+version = "4.3.0"
 name = "Orivot Free"
 tagline = "Snap the origin to 39 exact points on sides, corners and edges"
 maintainer = "Crater Creative <cratercreativeconsultancy@gmail.com>"
@@ -24,3 +24,6 @@ license = [
 copyright = [
   "2026 Crater Creative Consultancy L.L.C.",
 ]
+
+[permissions]
+network = "Check GitHub for a newer Orivot version when you ask"

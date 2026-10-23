@@ -33,6 +33,7 @@ the empty, so they are skipped.
 
 import bpy
 from mathutils import Matrix, Vector
+from . import support
 
 # Types whose .data exposes transform(matrix, shape_keys=...).
 DATA_TRANSFORM_TYPES = {'MESH', 'CURVE', 'SURFACE', 'LATTICE'}
@@ -113,8 +114,8 @@ def _transform_data_points(data, D):
                 if len(p) == 3:
                     q = D @ Vector((p[0], p[1], p[2]))
                     data[k] = [q.x, q.y, q.z]
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)
 
 
 def _transform_data(data, D):
@@ -125,11 +126,12 @@ def _transform_data(data, D):
         data.transform(D)
     try:
         data.update()
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         try:
             data.update_tag()
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
 
 
 def _compensate_user(u, Dinv, translation_only):
@@ -206,6 +208,7 @@ class object_mode:
         try:
             run_op(ctx, bpy.ops.object.mode_set, mode='OBJECT')
         except Exception as e:
+            support.note(e)
             print(f"[Orivot] could not enter Object Mode: {e}")
             self.ok = False
         return self
@@ -228,6 +231,7 @@ class object_mode:
             vl.objects.active = self.active
             run_op(ctx, bpy.ops.object.mode_set, mode=restore)
         except Exception as e:
+            support.note(e)
             print(f"[Orivot] could not restore {restore} mode: {e}")
         finally:
             try:
@@ -237,8 +241,8 @@ class object_mode:
                 for o in sel:
                     if o.name in vl.objects:
                         o.select_set(True)
-            except Exception:
-                pass
+            except Exception as _exc:
+                support.note(_exc)
         return False
 
 
@@ -299,6 +303,7 @@ def _native_origin_set(context, pairs, res):
                 run_op(context, bpy.ops.object.origin_set, type='ORIGIN_CURSOR', center='MEDIAN')
                 res.fallback += 1
             except Exception as e:
+                support.note(e)
                 res.skipped += 1
                 res.notes.append(f"{obj.name}: {e}")
             obj.select_set(False)
@@ -319,8 +324,8 @@ def set_origins(context, pairs):
     res = Result()
     try:
         context.view_layer.update()     # matrix_world must be current (no-op when clean)
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)
     fast, slow = [], []
     for obj, pos in pairs:
         if obj is None:

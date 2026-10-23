@@ -1,5 +1,17 @@
 # Changelog — Orivot Free
 
+## 4.3.0
+
+Orivot is now four editions: Free, Basic, Pro and the new Fabricator. Free stays free and open source.
+
+- **Pie actions on your own keys.** Every single-button pie action (the six faces, the centres, World Zero, the 3D Cursor snap) has an unbound entry in Preferences ▸ Add-ons ▸ Orivot Free ▸ Shortcuts. Tick it and click the key field.
+- **Report a Problem** (Settings) copies your Blender, OS and Orivot versions and any errors Orivot caught, ready to paste into an issue.
+- **Check for Updates** (Settings) reads `latest.json` from this repository and tells you when a new version is out. It only goes online when you click it (or at start-up if you turn that on), and only with Blender's Allow Online Access on.
+- **Updating without restarting Blender works:** installing a new zip over the old one loads the new code straight away.
+- **Upgrade buttons:** Settings ends with Basic | Pro | Fabricator buttons; hover one to see what it adds and its price.
+- Under the hood: the 9.5k-line `__init__.py` is split into modules, and every caught error is recorded for Report a Problem.
+- **Tested live in Blender 5.2.2** (every button on five selection cases, the redraws, undo) and headless on 4.5 LTS and 5.2 LTS. No errors.
+
 ## 4.2.5
 
 - **Section icons.** Quick Snap and Snap Points now show an icon in their header, like Origin Snaps and Settings, so the panel list reads at a glance. Only Blender's own icons are used, and each name is checked against the running Blender, so an icon renamed in a future version shows nothing instead of breaking the panel.

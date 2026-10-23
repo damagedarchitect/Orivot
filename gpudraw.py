@@ -11,6 +11,7 @@ Here lines use 'POLYLINE_UNIFORM_COLOR' (real width everywhere) and points
 
 import gpu
 from gpu_extras.batch import batch_for_shader
+from . import support
 
 _cache = {}
 
@@ -20,7 +21,8 @@ def _shader(name):
     if sh is None:
         try:
             sh = gpu.shader.from_builtin(name)
-        except Exception:
+        except Exception as _exc:
+            support.note(_exc)
             sh = None
         _cache[name] = sh
     return sh

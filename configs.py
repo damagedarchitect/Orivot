@@ -16,6 +16,7 @@ import sys
 
 import bpy
 from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty, StringProperty
+from . import support
 
 _SCOPES = [('FILE', "This File", "Saved inside this .blend (travels with the file)"),
            ('GLOBAL', "All Files", "Saved in the add-on preferences (every .blend)")]
@@ -58,6 +59,14 @@ class OrivotConfig(bpy.types.PropertyGroup):
     save_live_offset: BoolProperty(name="Live Toggle", default=False)
     save_copy_mode: BoolProperty(name="Copy Mode", default=False)
     show_details: BoolProperty(default=False, description="Show what this configuration restores")
+
+
+def _prefs(context):
+    try:
+        return context.preferences.addons[__package__].preferences
+    except Exception as _exc:
+        support.note(_exc)
+        return None
 
 
 def restore(cfg, scene):

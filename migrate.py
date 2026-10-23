@@ -16,6 +16,7 @@ overwritten, and a value that does not fit the new setting is skipped.
 
 import bpy
 from bpy.app.handlers import persistent
+from . import support
 
 
 # Every scene property PivotForge Pro 4.0.x registered. Only these are touched: anything
@@ -96,8 +97,8 @@ def _sys(idb):
             g = getter(do_create=True)
             if g is not None:
                 return g
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
     return idb
 
 
@@ -122,8 +123,8 @@ def _take(sc, key):
                 if value is None:
                     value = _plain(g[key])   # copy out BEFORE deleting: the items die with the key
                 del g[key]
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
     return value
 
 
@@ -142,12 +143,12 @@ def _scene(sc):
                 try:
                     dest[new] = _plain(src[k])
                     n += 1
-                except Exception:
-                    pass
+                except Exception as _exc:
+                    support.note(_exc)
             try:
                 del src[k]
-            except Exception:
-                pass
+            except Exception as _exc:
+                support.note(_exc)
     datums = _take(sc, "pivotforge_fab_datums")
     if datums and hasattr(sc, "orivot_fab_datums"):
         for it in datums:
@@ -158,8 +159,8 @@ def _scene(sc):
                 if loc is not None:
                     d.location = tuple(loc)[:3]
                 n += 1
-            except Exception:
-                pass
+            except Exception as _exc:
+                support.note(_exc)
     layers = _take(sc, "pivotforgeplace_snap_layers")
     if layers and hasattr(sc, "orivot_configs"):
         for it in layers:
@@ -179,17 +180,32 @@ def _scene(sc):
                     if isinstance(v, str):
                         try:
                             setattr(c, f, v)
-                        except Exception:
-                            pass
+                        except Exception as _exc:
+                            support.note(_exc)
                 n += 1
-            except Exception:
-                pass
+            except Exception as _exc:
+                support.note(_exc)
     return n
+
+
+def _cursor_target(sc):
+    """4.3: Snap to Object lost its '3D Cursor' target (index 5) to the 3D Cursor panel.
+    A scene saved with it falls back to Surface instead of an empty enum."""
+    try:
+        if sc.get("orivot_obj_snap_target_type") == 5:
+            sc["orivot_obj_snap_target_type"] = 0
+            return 1
+    except Exception as _exc:
+        support.note(_exc)
+    return 0
 
 
 def migrate_all():
     """Returns how many items were carried over (0 for an Orivot-only file)."""
     n = 0
+    for sc in bpy.data.scenes:
+        if sc.library is None:
+            n += _cursor_target(sc)
     for ob in bpy.data.objects:
         if ob.library is not None:
             continue
@@ -202,8 +218,8 @@ def migrate_all():
         seen.add(d.name_full)
         try:
             n += _id_keys(d, (("pivotforgepro_", "orivot_"),))
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
     for me in bpy.data.meshes:
         if me.library is not None:
             continue
@@ -227,6 +243,7 @@ def _on_load(*_):
     try:
         migrate_all()
     except Exception as exc:
+        support.note(exc)
         print(f"[Orivot] PivotForge data migration skipped: {exc!r}")
 
 
@@ -247,5 +264,5 @@ def unregister():
     try:
         if bpy.app.timers.is_registered(_first):
             bpy.app.timers.unregister(_first)
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)

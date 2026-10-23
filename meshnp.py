@@ -13,6 +13,7 @@ import contextlib
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
+from . import support
 
 AXIS = {'X': 0, 'Y': 1, 'Z': 2}
 
@@ -62,8 +63,8 @@ def _eval(obj):
     ctx = bpy.context
     try:
         ctx.view_layer.update()
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)
     dg = ctx.evaluated_depsgraph_get()
     oe = obj.evaluated_get(dg)
     me = oe.to_mesh()
@@ -79,7 +80,8 @@ def _read_attr(me, name, field, dtype, size):
         out = np.empty(size, dtype)
         a.data.foreach_get(field, out)
         return out
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         return None
 
 

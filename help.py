@@ -34,7 +34,8 @@ TOPICS = {
                    "Handles: shows clickable points on the bounding box; click one to snap. "
                    "They turn off after the snap so you can see the new origin; the pin keeps "
                    "them on to snap several objects in a row. Esc turns them off.",
-                   "Shortcuts: Alt+click surface, Alt+Shift+click vertex, Alt+Q pie."]}),
+                   "Shortcuts: Alt+click surface, Alt+Shift+click vertex, Alt+Q pie. Any pie "
+                   "action can get its own key: add-on preferences, Shortcuts."]}),
     "points": ("Snap Points", "points", {
         "object": ["39 fixed spots on the object: the 6 extreme sides, 8 corners, 12 edge "
                    "midpoints, 6 face centres, plus geometry / box / mass centre.",
@@ -170,6 +171,7 @@ TOPICS = {
 
 # Editions with fewer tools get wording that only mentions what they have (see tier.py).
 from . import tier                                          # noqa: E402
+from . import support
 TOPICS["origin"] = ("Origin Snaps", "origin", {
     "any": [TOPICS["origin"][2]["any"][0], TOPICS["origin"][2]["any"][1],
             "Front: which local axis is the object's front (for Front / Back / Left / Right)."]})
@@ -213,8 +215,8 @@ def _release():
     if _pcoll is not None:
         try:
             bpy.utils.previews.remove(_pcoll)
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
         _pcoll = None
     _loaded.clear()
 
@@ -241,7 +243,8 @@ def _icons(anim):
             p.image_size[0]                      # force the decode now, not on first draw
             ids.append(p.icon_id)
         _loaded[anim] = [ids[i] for i in _timing(anim, len(ids))] if ids else []
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         _loaded[anim] = []
     return _loaded[anim]
 
@@ -258,7 +261,8 @@ def enabled(context):
     """Preferences › Orivot Pro › 'Help buttons (?)'. On by default."""
     try:
         return context.preferences.addons[__package__].preferences.show_help_buttons
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         return True
 
 
@@ -343,7 +347,8 @@ def _tick():
                     for region in area.regions:
                         if region.type == 'UI':
                             region.tag_redraw()
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         return None
     return 1.0 / FPS
 
@@ -376,14 +381,14 @@ def unregister():
     try:
         if bpy.app.timers.is_registered(_tick):
             bpy.app.timers.unregister(_tick)
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)
     _release()
     try:
         del bpy.types.WindowManager.orivot_help
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)
     try:
         bpy.utils.unregister_class(ORIVOT_OT_help_toggle)
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)

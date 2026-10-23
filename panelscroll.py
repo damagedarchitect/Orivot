@@ -16,6 +16,7 @@ Turn it off any time: Preferences > Add-ons > Orivot Pro > "Remember Panel Scrol
 """
 
 import bpy
+from . import support
 
 PANEL_CATEGORY = "Orivot"
 TICK = 0.2              # seconds between checks
@@ -57,7 +58,8 @@ def reset_state():
 def _enabled():
     try:
         return bool(bpy.context.preferences.addons[__package__].preferences.remember_panel_scroll)
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         return True
 
 
@@ -65,7 +67,8 @@ def _mode_of(win):
     try:
         ob = win.view_layer.objects.active
         return ob.mode if ob is not None else 'OBJECT'
-    except Exception:
+    except Exception as _exc:
+        support.note(_exc)
         return 'OBJECT'
 
 
@@ -201,6 +204,7 @@ def _tick():
                 del _state[key]
         _errors = 0
     except Exception as exc:
+        support.note(exc)
         _errors += 1
         if _errors >= MAX_FAILURES:
             _disable(repr(exc))
@@ -223,6 +227,6 @@ def unregister():
     try:
         if bpy.app.timers.is_registered(_tick):
             bpy.app.timers.unregister(_tick)
-    except Exception:
-        pass
+    except Exception as _exc:
+        support.note(_exc)
     reset_state()

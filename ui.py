@@ -21,6 +21,8 @@ from mathutils import Vector
 
 from . import help as _help
 from . import tier
+from . import support
+from . import icons
 
 CATEGORY = "Orivot"
 
@@ -236,20 +238,28 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def upgrade_buttons(layout):
-    """Free only: one full-width row of heart buttons, the last line of the Settings panel
-    (a panel of its own would bring a collapse arrow, or sit at the top without a header).
-    Basic gets a small heart on the Help Buttons row instead. What each edition adds is in
-    the tooltips (ORIVOT_OT_open_upgrade.description)."""
+    """Free only: one full-width row of heart buttons (Basic | Pro | Fabricator), the last
+    line of the Settings panel (a panel of its own would bring a collapse arrow, or sit at
+    the top without a header). Red hearts: Basic / Pro, blue heart: Fabricator. What each
+    edition adds is in the tooltips (ORIVOT_OT_open_upgrade.description)."""
     layout.separator()
     row = layout.row(align=True)
-    row.operator("orivot.open_upgrade", text="Basic", icon=icon('FUND')).edition = 'BASIC'
-    row.operator("orivot.open_upgrade", text="Pro", icon=icon('FUND')).edition = 'PRO'
+    row.operator("orivot.open_upgrade", text="Basic", **icons.kw("heart_red")).edition = 'BASIC'
+    row.operator("orivot.open_upgrade", text="Pro", **icons.kw("heart_red")).edition = 'PRO'
+    row.operator("orivot.open_upgrade", text="Fabricator", **icons.kw("heart_blue")).edition = 'FAB'
+
+
+def upgrade_hearts(row, context):
+    """Paid editions: icon-only hearts at the end of the Help Buttons row.
+    Basic: red (Pro) and blue (Fabricator). Pro: one blue heart (Fabricator) that is gone for
+    good after its first click (the Fabricator link stays in the add-on preferences)."""
+    return
 
 
 class VIEW3D_PT_orivot_settings(_Panel, bpy.types.Panel):
     bl_label = "Settings"
     bl_idname = "VIEW3D_PT_orivot_settings"
-    bl_order = 3
+    bl_order = 20
     bl_options = (set())
 
     def draw_header(self, context):
@@ -259,12 +269,17 @@ class VIEW3D_PT_orivot_settings(_Panel, bpy.types.Panel):
         r = self.layout.row(align=True)
         r.operator("orivot.show_shortcuts_info", text="Shortcuts", icon='EVENT_ALT')
         r.operator("preferences.addon_show", text="Defaults", icon='PREFERENCES').module = __package__
+        support.draw_settings_rows(self.layout)
+        P = _pkg()
+        if getattr(P, "presets", None) is not None:
+            P.presets.draw(self.layout)
         row = self.layout.row(align=True)
         try:
             prefs = context.preferences.addons[__package__].preferences
             row.prop(prefs, "show_help_buttons", icon='QUESTION')
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
+        upgrade_hearts(row, context)
         col = self.layout.column(align=True)
         col.prop(context.scene, "orivot_flip_left_right", text="Swap Left / Right labels")
         col.prop(context.scene, "orivot_show_mode_indicator", text="Mode indicator in viewport")
@@ -320,5 +335,5 @@ def unregister():
     for c in reversed(CLASSES):
         try:
             bpy.utils.unregister_class(c)
-        except Exception:
-            pass
+        except Exception as _exc:
+            support.note(_exc)
