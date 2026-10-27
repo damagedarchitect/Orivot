@@ -1,5 +1,11 @@
 # Changelog — Orivot Free
 
+## 4.3.1 - 2026-10-27
+
+- Settings: the Shortcuts and Defaults buttons are replaced by a gear icon (left of Help Buttons) that opens the add-on preferences at the Shortcuts section.
+- Report a Problem moved to the add-on preferences (Support).
+- Removed Check for Updates, its start-up preference and the network permission. Orivot Free makes no network calls.
+
 ## 4.3.0
 
 Orivot is now four editions: Free, Basic, Pro and the new Fabricator. Free stays free and open source.
