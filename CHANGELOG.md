@@ -1,6 +1,6 @@
-# Changelog — Orivot Free
+# Changelog - Orivot Free
 
-## 4.3.1 - 2026-10-27
+## 4.3.1
 
 - Settings: the Shortcuts and Defaults buttons are replaced by a gear icon (left of Help Buttons) that opens the add-on preferences at the Shortcuts section.
 - Report a Problem moved to the add-on preferences (Support).
