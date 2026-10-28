@@ -1,4 +1,4 @@
 {
-  "version": "4.3.0",
-  "notes": "Four editions, 3D Cursor tools, print prep in Basic, drawings and schedules in Fabricator"
+  "version": "4.3.1", 
+  "notes": "Shortcuts gear and Report a Problem move into Preferences; update check removed."
 }
