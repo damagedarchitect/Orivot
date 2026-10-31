@@ -21,6 +21,12 @@ from . import common
 from . import preview
 
 
+# Objects without a separate origin: a camera, light, light probe, speaker or empty IS its
+# origin. Moving "its origin" would move the object itself (a camera loses its framing, a
+# light its aim), which an Origin Snaps tool must never do: they are left alone and named.
+NO_ORIGIN_TYPES = {'CAMERA', 'LIGHT', 'LIGHT_PROBE', 'SPEAKER', 'EMPTY'}
+
+
 # ── FEATURE 4: Snap to another object's origin (eyedropper picker) ────────────
 # ── FEATURE 4b: Move object to another object's origin ───────────────────────
 # ── FEATURE 5: Align origins across selection ─────────────────────────────────

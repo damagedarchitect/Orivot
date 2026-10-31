@@ -4,7 +4,7 @@ bl_info = {
     "category": "Object",
     "description": ("Origin snapping to 39 exact points on any mesh: extreme sides, corners, edge midpoints, face centres and geometry / bounding-box / mass centres, plus 3D Cursor, World Zero and an Alt+Q pie menu."),
     "author": "DaMagedArchitect",
-    "version": (4, 3, 2),
+    "version": (4, 3, 3),
     "doc_url": "https://discord.com/users/damagedarchitect",
     "tracker_url": "https://discord.com/users/damagedarchitect",
 }

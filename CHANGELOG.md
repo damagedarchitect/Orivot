@@ -1,5 +1,11 @@
 # Changelog - Orivot Free
 
+## 4.3.3
+
+- **Faster on big selections:** snapping the origins of 1600 objects at once takes about 0.7 s (1.2 s before). Moving origins asked Blender for each object's children, which walks the whole file every time.
+- The other 4.3.3 fixes are in the paid editions (Scene Health no longer lists cameras and lights; origin tools never move cameras, lights or empties; Import Cleanup keeps the empties your scene uses).
+- Tested live in Blender 5.2.3 and headless on 4.5 LTS and 5.2 LTS. No errors.
+
 ## 4.3.2
 
 - **Ground** (Quick Snap and the Alt+Q pie, also bindable to a key): the origin goes to the bottom centre of each selected object's world-aligned box and the object rests on the floor (Z = 0), in one undo step. Every object is grounded on its own, parents before children.

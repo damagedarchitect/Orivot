@@ -170,12 +170,25 @@ def mom_preview_active(scene=None):
         scene = bpy.context.scene
     if not getattr(scene, 'orivot_show_preview', False):
         return False
+    if _MOM["pass"] is not None:                # inside one depsgraph pass: computed once
+        return _MOM["val"]
     try:
-        sel = [o for o in bpy.context.selected_objects if o.type in common.GEOMETRY_TYPES]
-        return len(sel) >= 2
+        n = 0
+        for o in bpy.context.selected_objects:
+            if o.type in common.GEOMETRY_TYPES:
+                n += 1
+                if n >= 2:
+                    return True
+        return False
     except Exception as _exc:
         support.note(_exc)
         return False
+
+
+# One depsgraph update asks mom_preview_active once per previewed object; the selection
+# cannot change during the pass, so the handler computes it once (4.3.3: 1600 objects
+# selected = 1600 x 1600 selection walks, ~0.6 s per snap).
+_MOM = {"pass": None, "val": False}
 
 
 # ---------------- Preview management (cache + handlers) ----------------
@@ -358,6 +371,17 @@ def depsgraph_update_handler(scene, depsgraph):
 
     # ── Preview ON from here ──────────────────────────────────────────────────
     ensure_handlers()
+    _MOM["pass"] = None
+    _MOM["val"] = mom_preview_active(scene)
+    _MOM["pass"] = True
+    try:
+        _depsgraph_update_preview_on(scene, depsgraph)
+    finally:
+        _MOM["pass"] = None
+
+
+def _depsgraph_update_preview_on(scene, depsgraph):
+    """The preview-on part of depsgraph_update_handler (mom_preview_active cached)."""
 
     # NOTE: Multi-Object PREVIEW is now a DERIVED state (see mom_preview_active).
     # We deliberately do NOT mutate orivot_multi_object_preview or

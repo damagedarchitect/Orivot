@@ -148,12 +148,25 @@ def _compensate_user(u, Dinv, translation_only):
     return old_w, old_w @ Dinv
 
 
-def _compensate_children(parent, old_w, new_w):
+def _children_index():
+    """{parent pointer: [direct children]} in ONE pass over the file. Object.children walks
+    every object of the file on each call, so asking it once per rebased object made a
+    1600-object batch O(N^2) (~0.5 s of a 1 s batch, 4.3.3)."""
+    idx = {}
+    for o in bpy.data.objects:
+        p = o.parent
+        if p is not None:
+            idx.setdefault(p.as_pointer(), []).append(o)
+    return idx
+
+
+def _compensate_children(parent, old_w, new_w, kids=None):
     """Keep every direct child of `parent` fixed in world space."""
-    if not parent.children:
+    children = kids.get(parent.as_pointer(), ()) if kids is not None else parent.children
+    if not children:
         return
     delta = new_w.inverted_safe() @ old_w
-    for c in parent.children:
+    for c in children:
         if c.parent_type in _OBJECT_PARENT_TYPES:
             c.matrix_parent_inverse = delta @ c.matrix_parent_inverse
 
@@ -257,6 +270,8 @@ def rebase(context, items, translation_only=False, result=None):
     res = result or Result()
     users = None
     done = set()
+    items = list(items)
+    kids = _children_index() if len(items) > 8 else None
     for obj, D in items:
         if not can_fast_rebase(obj):
             res.skipped += 1
@@ -276,7 +291,7 @@ def rebase(context, items, translation_only=False, result=None):
         _transform_data(obj.data, D)
         for u in owners:
             old_w, new_w = _compensate_user(u, Dinv, translation_only)
-            _compensate_children(u, old_w, new_w)
+            _compensate_children(u, old_w, new_w, kids)
         res.moved += 1
     return res
 

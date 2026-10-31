@@ -1,4 +1,4 @@
 {
-  "version": "4.3.2",
-  "notes": "Ground: origin to the bottom centre and the object on the floor in one click (Quick Snap and the pie)."
+  "version": "4.3.3",
+  "notes": "Faster batch snapping of many objects; fixes in the paid editions."
 }
