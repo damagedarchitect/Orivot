@@ -1,4 +1,5 @@
 <img width="1709" height="983" alt="image" src="https://github.com/user-attachments/assets/e805a143-33bf-4ab1-a719-47634d524f67" />
+<img width="307" height="1259" alt="Orivot Free UI" src="https://github.com/user-attachments/assets/1f48b48d-012e-4214-bc7f-f0a3a483c750" />
 
 # Orivot Free
 
@@ -25,6 +26,7 @@ Built for architecture, interiors and exhibition work, where an origin at the fl
   - **3D Cursor** moves the origin to the cursor.
 - **Local or Global orientation, and a Front axis.** "Front" and "Left" mean the object's own front, not just −Y.
 - **Quick Snap:** the origin goes to the 3D Cursor or to World Zero.
+- **Ground:** one click puts the origin at the bottom centre of each selected object and rests it on the floor (Z = 0), in one undo step. Tilted parts touch the floor exactly; collection instances are set on the floor by what they show.
 - **Alt+Q pie menu** with configurable slots, plus **Object ▸ Set Origin to...** and right-click menu entries.
 - **In-panel help:** a **?** on each panel plays a short animation of what it does.
 - **Works on many objects at once:** every selected mesh gets its own origin snapped.
@@ -54,7 +56,7 @@ Orivot comes in four editions. Each one contains everything in the edition below
 
 | | **Free** | **Basic** | **Pro** | **Fabricator** |
 |---|:-:|:-:|:-:|:-:|
-| 39 snap points, centres, 3D Cursor / World Zero, Alt+Q pie | ✔ | ✔ | ✔ | ✔ |
+| 39 snap points, centres, 3D Cursor / World Zero, Ground, Alt+Q pie | ✔ | ✔ | ✔ | ✔ |
 | Surface / vertex snapping, handles, Multi-Object, offsets, copy / paste | | ✔ | ✔ | ✔ |
 | 3D Cursor panel: object to cursor, cursor to box points | | ✔ | ✔ | ✔ |
 | 3D Print: orient, drop to bed, batch STL | | ✔ | ✔ | ✔ |
@@ -138,7 +140,7 @@ Every panel open, Object Mode and Edit Mode. Click an edition to see it.
 </details>
 
 <details>
-<summary><b>Orivot Free</b>: 39 snap points, Quick Snap, pie menu</summary>
+<summary><b>Orivot Free</b>: 39 snap points, Quick Snap, Ground, pie menu</summary>
 
 <table>
   <thead>

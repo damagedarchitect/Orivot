@@ -14,6 +14,7 @@ from bpy_extras.view3d_utils import (
 )
 
 from . import core
+from . import geo
 from . import meshnp
 from . import tier
 from . import state
@@ -397,13 +398,8 @@ def get_bbox_local(obj):
     return [Vector(corner) for corner in obj.bound_box]
 
 
-# Object types whose bound_box describes real geometry extents. Everything else
-# (empties, lights, cameras, speakers, lattices) has no meaningful volume, so we
-# treat its origin point as its only contributing location.
-GEOMETRY_TYPES = {
-    'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',
-    'CURVES', 'POINTCLOUD', 'VOLUME', 'GPENCIL', 'GREASEPENCIL',
-}
+# 4.3.2: one definition, in geo.py (instances count by what they show).
+GEOMETRY_TYPES = geo.GEOMETRY_TYPES
 
 
 VALID_FRONT_AXES = {

@@ -16,6 +16,8 @@ from bpy_extras.view3d_utils import (
 )
 
 from . import core
+from . import geo
+from . import opkit
 from . import gpudraw
 from . import tier
 try:
@@ -188,6 +190,106 @@ _doc = _doc[:_doc.index("\n\nEdit Mode  \u00b7  Line Snap")]
 _doc = _doc[:_doc.index("\nAlt + Click")]
 ORIVOT_OT_show_shortcuts_info.bl_description = _doc
 del _doc
+
+
+def ground(context, objs):
+    """Ground: origin to the bottom centre of each object's world-aligned box (tight, on the
+    evaluated geometry), then the object straight down / up so that origin sits on world Z = 0.
+    Each object on its own; parents before children. -> (grounded objects, [(obj, reason)])."""
+    ok, skipped = opkit.targets(context, types=geo.GEOMETRY_TYPES, need_data=True, objects=objs)
+    dg = context.evaluated_depsgraph_get()
+    pairs, empty = [], []
+    for o in ok:
+        ext = geo.world_extent(o, dg)
+        if ext is None:
+            empty.append(o)
+            continue
+        pairs.append((o, geo.bottom_centre(*ext)))
+    skipped += [(o, "no geometry") for o in empty]
+    if not pairs:
+        return [], skipped
+    for o, _p in pairs:
+        common._record_history(o)
+    res = core.set_origins(context, pairs)          # geometry, children, linked dupes stay put
+    done = [o for o, _p in pairs]
+    if res.skipped:
+        # core refused some (unsupported data): only ground the ones whose origin moved
+        moved = []
+        for o, p in pairs:
+            if (o.matrix_world.translation - p).length <= 1e-6 * max(1.0, p.length):
+                moved.append(o)
+            else:
+                skipped.append((o, "origin could not be moved"))
+        done = moved
+    for o in geo.by_depth(done):
+        context.view_layer.update()                  # a parent above may just have moved
+        # rest the GEOMETRY on Z = 0 (= the origin, which now sits on its bottom). Measured
+        # again rather than taken from the origin: linked duplicates share one origin offset,
+        # so a turned twin's origin cannot be on its own bottom, but its geometry still lands.
+        ext = geo.world_extent(o, context.evaluated_depsgraph_get())
+        z = ext[0].z if ext is not None else o.matrix_world.translation.z
+        if abs(z) > 0.0:
+            o.matrix_world = Matrix.Translation((0.0, 0.0, -z)) @ o.matrix_world
+    return done, skipped
+
+
+def _is_instance(o):
+    return geo.is_collection_instance(o)
+
+
+def drop_instances(context, objs):
+    """Collection instances: move each so what it SHOWS rests on Z = 0, measured on the real
+    vertices of every instanced object (geo.instance_extent: rotation, offset, nesting and
+    members' modifiers exact). An instance's origin is its collection's instance offset, shared
+    by every instance, so Ground does not change it. -> (dropped, [(obj, reason)])."""
+    done, skipped = [], []
+    for o in geo.by_depth(objs):
+        context.view_layer.update()
+        box = geo.instance_extent(o, context.evaluated_depsgraph_get())   # tight: real vertices
+        if box is None:
+            skipped.append((o, "shows no geometry (empty collection or hidden)"))
+            continue
+        o.matrix_world = Matrix.Translation((0.0, 0.0, -box[0].z)) @ o.matrix_world
+        done.append(o)
+    return done, skipped
+
+
+class ORIVOT_OT_ground(bpy.types.Operator):
+    """Ground: origin to the BOTTOM CENTRE of each object's world-aligned bounding box, then
+    the object down (or up) so it rests on the floor (world Z = 0). Every selected object on
+    its own, one undo step. The box is the real geometry's (modifiers included), so tilted
+    parts touch the floor exactly; it is the box, not the centre of mass"""
+    bl_idname = "orivot.ground"
+    bl_label = "Ground"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if context.mode != 'OBJECT':
+            return False
+        if not any(o.type in geo.GEOMETRY_TYPES or _is_instance(o) for o in context.selected_objects):
+            cls.poll_message_set("Select one or more objects with geometry")
+            return False
+        return True
+
+    def execute(self, context):
+        objs = [o for o in context.selected_objects if o.type in geo.GEOMETRY_TYPES]
+        insts, inst_skipped = opkit.targets(
+            context, need_data=False,
+            objects=[o for o in context.selected_objects if _is_instance(o)])
+        done, skipped = ground(context, objs)
+        dropped, drop_skipped = drop_instances(context, insts)
+        skipped += inst_skipped + drop_skipped
+        if not done and not dropped:
+            self.report({'WARNING'}, "Nothing grounded" + opkit.skipped_note(skipped))
+            return {'CANCELLED'}
+        msg = f"✓ Grounded {len(done)} object(s): origin at bottom centre, resting on Z = 0"
+        if dropped:
+            msg += (f" · {len(dropped)} collection instance(s) set on the floor (their origin "
+                    f"is the collection's: Instances › Rebase moves it)")
+        self.report({'INFO'}, msg + opkit.skipped_note(skipped))
+        preview._tag_view3d_redraw()
+        return {'FINISHED'}
 
 
 class ORIVOT_OT_snap_to_world_zero(bpy.types.Operator):

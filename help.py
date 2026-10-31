@@ -31,6 +31,9 @@ TOPICS = {
                    "Vertex: drag over the mesh, it snaps to the nearest vertex. "
                    "Hold Ctrl for grid steps.",
                    "Grid: nearest grid point. Cursor: the 3D cursor. World 0: (0,0,0).",
+                   "Ground: the origin goes to the bottom centre of each object's box and the "
+                   "object rests on the floor (Z = 0), in one undo step. Collection instances "
+                   "are set on the floor by what they show.",
                    "Handles: shows clickable points on the bounding box; click one to snap. "
                    "They turn off after the snap so you can see the new origin; the pin keeps "
                    "them on to snap several objects in a row. Esc turns them off.",
@@ -177,6 +180,8 @@ TOPICS["origin"] = ("Origin Snaps", "origin", {
             "Front: which local axis is the object's front (for Front / Back / Left / Right)."]})
 TOPICS["quick"] = ("Quick Snap", "quick", {
     "object": ["3D Cursor: the origin goes to the 3D cursor. World Zero: to (0, 0, 0).",
+               "Ground: origin to the bottom centre, object resting on the floor (Z = 0). "
+               "Each selected object on its own, one undo step.",
                "Alt+Q opens the pie menu with the most used snap points."]})
 TOPICS["points"] = ("Snap Points", "points", {
     "object": [TOPICS["points"][2]["object"][0], TOPICS["points"][2]["object"][3],

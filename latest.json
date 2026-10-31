@@ -1,4 +1,4 @@
 {
-  "version": "4.3.1", 
-  "notes": "Shortcuts gear and Report a Problem move into Preferences; update check removed."
+  "version": "4.3.2",
+  "notes": "Ground: origin to the bottom centre and the object on the floor in one click (Quick Snap and the pie)."
 }

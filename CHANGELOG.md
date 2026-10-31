@@ -1,5 +1,15 @@
 # Changelog - Orivot Free
 
+## 4.3.2
+
+- **Ground** (Quick Snap and the Alt+Q pie, also bindable to a key): the origin goes to the bottom centre of each selected object's world-aligned box and the object rests on the floor (Z = 0), in one undo step. Every object is grounded on its own, parents before children.
+  - The box is measured on the real geometry, modifiers included, so tilted parts touch the floor exactly. It is the box, not the centre of mass.
+  - Collection instances are set on the floor by what they show; their origin (the collection's) is left alone.
+  - Objects linked from a library are skipped and named in the report.
+- Quick Snap: 3D Cursor | World Zero on one row, Ground below.
+- Tested live in Blender 5.2.3 (every button on five selection cases, the redraws, undo) and headless on 4.5 LTS and 5.2 LTS. No errors.
+- Screenshots of every edition's sidebar in the README are new.
+
 ## 4.3.1
 
 - Settings: the Shortcuts and Defaults buttons are replaced by a gear icon (left of Help Buttons) that opens the add-on preferences at the Shortcuts section.

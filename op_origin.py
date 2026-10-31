@@ -4,6 +4,7 @@ Split out of __init__.py in 4.3 (tools/split_init.py), then by area (tools/split
 
 import bpy
 from mathutils import Vector
+from . import geo
 from . import meshnp
 from . import tier
 from . import state
@@ -223,7 +224,7 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
             normal_local = _FACE_NORMALS_LOCAL[self.mode]
             for aobj in affected_objects:
                 if scene.orivot_preview_orientation == 'LOCAL':
-                    nw = (aobj.matrix_world.to_3x3() @ normal_local).normalized()
+                    nw = geo.normal_to_world(aobj.matrix_world, normal_local)
                 else:
                     nw = normal_local.normalized()
                 common._last_snap_normals[aobj.name] = nw

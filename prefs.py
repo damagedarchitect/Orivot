@@ -189,11 +189,6 @@ class OrivotAddonPreferences(bpy.types.AddonPreferences):
         name="Write Log File",
         default=False,
         description="Also append caught errors to orivot_log.txt in Blender's config folder")
-    check_updates_on_startup: bpy.props.BoolProperty(
-        name="Check for Updates at Start-up",
-        default=False,
-        description="Once per session, read a small file on GitHub to see whether a newer "
-                    "Orivot exists. Only when Blender's Allow Online Access is on")
 
     configs         : bpy.props.CollectionProperty(type=_configs.OrivotConfig)
     named_groups    : bpy.props.CollectionProperty(type=op_tools.OrivotProNamedGroup)

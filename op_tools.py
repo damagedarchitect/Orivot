@@ -9,6 +9,7 @@ from mathutils import Vector, Matrix
 import gpu
 from gpu_extras.batch import batch_for_shader
 from bpy_extras.view3d_utils import location_3d_to_region_2d
+from . import opkit
 from . import meshnp
 from . import gpudraw
 from . import state

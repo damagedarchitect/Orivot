@@ -1,4 +1,6 @@
-"""Support: error log and "Report a Problem" (every edition). Update check: updater.py.
+"""Support: error log and "Report a Problem" (every edition).
+
+Report a Problem lives in the add-on preferences (draw_prefs).
 
 Error log
     Orivot has many `except Exception:` blocks that keep a draw handler or a timer alive
@@ -11,9 +13,6 @@ Error log
 Report a Problem
     Copies Blender / add-on / OS versions, the edition, the scene's unit settings and the
     recent errors to the clipboard, ready to paste in a Discord message.
-
-The update check lives in updater.py so the extensions.blender.org build (which gets
-updates from the platform) can ship without it.
 """
 
 import os
@@ -171,52 +170,43 @@ class ORIVOT_OT_open_log(bpy.types.Operator):
         return {'FINISHED'}
 
 
-def _updater():
-    try:
-        from . import updater
-        return updater
-    except ImportError:
-        return None
+class ORIVOT_OT_open_shortcuts(bpy.types.Operator):
+    """Open Orivot's add-on preferences with the Shortcuts section expanded, to bind or change
+    its keys"""
+    bl_idname = "orivot.open_shortcuts"
+    bl_label = "Shortcuts"
+    bl_options = {'INTERNAL'}
 
-
-def draw_settings_rows(layout):
-    """The Settings panel row: Report a Problem + Check for Updates (and its result)."""
-    row = layout.row(align=True)
-    row.operator("orivot.report_problem", text="Report", icon='ERROR')
-    up = _updater()
-    if up is not None:
-        up.draw_button(row, layout)
+    def execute(self, context):
+        p = _prefs()
+        if p is not None and hasattr(p, "show_shortcuts"):
+            p.show_shortcuts = True
+        bpy.ops.preferences.addon_show(module=__package__)
+        return {'FINISHED'}
 
 
 def draw_prefs(prefs, layout):
     box = layout.box()
     box.label(text="Support", icon='HELP')
     col = box.column(align=True)
+    col.operator("orivot.report_problem", text="Report a Problem", icon='ERROR')
+    col.separator()
     col.prop(prefs, "log_verbose")
     row = col.row(align=True)
     row.prop(prefs, "log_to_file")
     row.operator("orivot.open_log", text="", icon='FILEBROWSER')
-    up = _updater()
-    if up is not None:
-        up.draw_prefs(prefs, col)
 
 
-CLASSES = (ORIVOT_OT_report_problem, ORIVOT_OT_open_log)
+CLASSES = (ORIVOT_OT_report_problem, ORIVOT_OT_open_log, ORIVOT_OT_open_shortcuts)
 
 
 def register():
     for c in CLASSES:
         bpy.utils.register_class(c)
     tier._ops.update(c.bl_idname for c in CLASSES)
-    up = _updater()
-    if up is not None:
-        up.register()
 
 
 def unregister():
-    up = _updater()
-    if up is not None:
-        up.unregister()
     for c in reversed(CLASSES):
         try:
             bpy.utils.unregister_class(c)

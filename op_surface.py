@@ -14,6 +14,7 @@ from bpy_extras.view3d_utils import (
     location_3d_to_region_2d,
 )
 
+from . import geo
 from . import gpudraw
 from . import state
 try:

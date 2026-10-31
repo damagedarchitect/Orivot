@@ -4,7 +4,7 @@ bl_info = {
     "category": "Object",
     "description": ("Origin snapping to 39 exact points on any mesh: extreme sides, corners, edge midpoints, face centres and geometry / bounding-box / mass centres, plus 3D Cursor, World Zero and an Alt+Q pie menu."),
     "author": "DaMagedArchitect",
-    "version": (4, 3, 0),
+    "version": (4, 3, 2),
     "doc_url": "https://discord.com/users/damagedarchitect",
     "tracker_url": "https://discord.com/users/damagedarchitect",
 }
@@ -41,6 +41,8 @@ from bpy_extras.view3d_utils import (
 )
 
 try:
+    from . import geo               # 4.3.2: shared bounds / normals / evaluated-mesh queries
+    from . import opkit             # 4.3.2: shared operator plumbing (targets, confirm, export paths)
     from . import core              # exact origin / axis rebasing (no cursor, no bpy.ops)
     from . import meshnp            # vectorised evaluated-mesh queries
     from . import configs as _configs   # Saved Configurations (this file / all files)
@@ -191,6 +193,7 @@ from .pie import (
 from .place import (
     ORIVOT_OT_show_shortcuts_info,
     ORIVOT_OT_snap_to_world_zero,
+    ORIVOT_OT_ground,
 )
 from .prefs import (
     ORIVOT_OT_apply_preference_defaults,
@@ -287,6 +290,7 @@ FREE_CLASSES = (
     ORIVOT_OT_reset_pie_defaults,
     ORIVOT_OT_set_origin_extreme_full,
     ORIVOT_OT_snap_to_world_zero,
+    ORIVOT_OT_ground,
     ORIVOT_OT_show_shortcuts_info,
     ORIVOT_OT_run_action,
     VIEW3D_MT_orivot_pie,

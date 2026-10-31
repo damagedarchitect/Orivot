@@ -91,6 +91,7 @@ ORIVOT_PIE_ACTIONS = [
     ('DROP_TO_BED',        "Drop to Bed",      "Rest the selection on Z = 0 (print bed / floor)",         'TRIA_DOWN_BAR', 27),
     ('DROP_TO_LEVEL',      "Drop to Level",    "Rest the selection on the Orivot level below it",         'ANCHOR_BOTTOM', 28),
     ('SNAP_TO_GRIDLINES',  "Snap to Gridlines","Snap the selection to the nearest Orivot gridline intersection", 'MESH_GRID', 29),
+    ('GROUND',             "Ground",           "Origin to the bottom centre, object resting on Z = 0 (one undo step)", 'TRIA_DOWN_BAR', 30),
     ('NONE',               "— Empty —",        "Leave this pie position empty",                         'BLANK1',        24),
 ]
 
@@ -145,6 +146,7 @@ ACTION_OPS = {
     'PLACE_ON_SURFACE':    ("orivot.place_on_surface", {}, "Place on Surface", 'CURSOR'),
     'SNAP_TO_CURVE':       ("orivot.snap_to_curve", {}, "Snap to Curve", 'CURVE_DATA'),
     'WORLD_ZERO':          ("orivot.snap_to_world_zero", {}, "World Zero", 'WORLD'),
+    'GROUND':              ("orivot.ground", {}, "Ground", 'TRIA_DOWN_BAR'),
     'SNAP_TO_GRID':        ("orivot.snap_to_grid", {}, "Snap to Grid", 'SNAP_GRID'),
     'SYMMETRY_AUTO':       ("orivot.symmetry_origin", {'axis': 'AUTO'}, "Mirror Plane (Auto)", 'MOD_MIRROR'),
     'OBJECT_TO_CURSOR':    ("orivot.object_to_cursor", {}, "Object to Cursor", 'ORIENTATION_CURSOR'),

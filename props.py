@@ -14,6 +14,7 @@ from bpy_extras.view3d_utils import (
 )
 
 from . import configs as _configs
+from . import tier
 try:
     from . import linesnap
 except ImportError:
@@ -105,7 +106,8 @@ def _register_props():
 
     bpy.types.Scene.orivot_show_preview = bpy.props.BoolProperty(
         name="Show Origin Preview",
-        default=False
+        description="Show the live origin preview in the viewport",
+        default=tier.BASIC,      # on at first run in Basic and up; Free has no Preview panel
     )
     bpy.types.Scene.orivot_preview_color = bpy.props.FloatVectorProperty(
         name="Highlight Color",

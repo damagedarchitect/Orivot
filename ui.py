@@ -6,7 +6,8 @@ mode where they work:
   Origin Snaps   moves the ORIGIN only; the geometry never moves
   Object Snaps   moves / rotates whole OBJECTS (Object Mode) or geometry (Edit Mode)
   Fabrication    cut files, cut lists, flat-pack, mates, datums
-  Settings       preview & display, saved configurations
+  Preview        first panel: live preview on/off in its header, Display sub-panel
+  Settings       last panel: presets + Reset, gear, Help, hearts, Saved Configurations
 
 Every sub-panel has a ? button in its header: it opens an animated explanation inside the
 panel (see help.py). Panels are native Blender panels: Ctrl-click a header to collapse all
@@ -111,7 +112,7 @@ _BOTH = {'OBJECT', 'EDIT_MESH'}
 class VIEW3D_PT_orivot_origin(_Panel, bpy.types.Panel):
     bl_label = "Origin Snaps"
     bl_idname = "VIEW3D_PT_orivot_origin"
-    bl_order = 0
+    bl_order = 1
     help_id = "origin"
 
     def draw_header(self, context):
@@ -158,6 +159,9 @@ class VIEW3D_PT_orivot_quick(_Panel, bpy.types.Panel):
         row.scale_y = 1.15
         row.operator("orivot.set_origin_extreme_full", text="3D Cursor", icon='CURSOR').mode = 'CURSOR'
         row.operator("orivot.snap_to_world_zero", text="World Zero", icon='WORLD')
+        row = col.row(align=True)
+        row.scale_y = 1.15
+        row.operator("orivot.ground", text="Ground", icon='TRIA_DOWN_BAR')
         return
 
 
@@ -256,30 +260,47 @@ def upgrade_hearts(row, context):
     return
 
 
+# orivot-layout: preview-top / settings-bottom (v2)
+# Panel order in the Orivot tab (bl_order is unsigned in Blender: it cannot go below 0).
+#   PREVIEW_ORDER   0       Preview & Display, first
+#   tool panels     1..14   Origin Snaps is 1, then Cursor, Object Snaps, Layout, ... Drawings 14
+#   SETTINGS_ORDER  100     above every tool panel, so Settings is last
+# If you add a tool panel, give it an order between 1 and 99.
+# Shortcuts button: the first icon of the Help / hearts row, so it is exactly the hearts' size.
+# It opens Orivot's add-on preferences with the Shortcuts section expanded.
+PREVIEW_ORDER = 0
+SETTINGS_ORDER = 100
+SHORTCUT_ICON = 'PREFERENCES'
+
+
+def _settings_section(layout, context):
+    """Body of the Settings panel: the Use-Case Preset menu with Reset, then one row: the
+    gear (add-on preferences, Shortcuts section open), the Help Buttons toggle and the
+    upgrade hearts (tier dependent)."""
+    P = _pkg()
+    if getattr(P, "presets", None) is not None:
+        P.presets.draw(layout)
+    row = layout.row(align=True)                       # same row, same mechanism as the hearts:
+    row.operator("orivot.open_shortcuts", text="", icon=SHORTCUT_ICON)   # so the same size
+    try:
+        prefs = context.preferences.addons[__package__].preferences
+        row.prop(prefs, "show_help_buttons", icon='QUESTION')
+    except Exception as _exc:
+        support.note(_exc)
+    upgrade_hearts(row, context)
+
+
 class VIEW3D_PT_orivot_settings(_Panel, bpy.types.Panel):
     bl_label = "Settings"
     bl_idname = "VIEW3D_PT_orivot_settings"
-    bl_order = 20
-    bl_options = (set())
+    bl_order = SETTINGS_ORDER
+    bl_options = set()                  # expanded by default in every edition
 
     def draw_header(self, context):
         self.layout.label(text="", icon='PREFERENCES')
 
     def body(self, context):
-        r = self.layout.row(align=True)
-        r.operator("orivot.show_shortcuts_info", text="Shortcuts", icon='EVENT_ALT')
-        r.operator("preferences.addon_show", text="Defaults", icon='PREFERENCES').module = __package__
-        support.draw_settings_rows(self.layout)
-        P = _pkg()
-        if getattr(P, "presets", None) is not None:
-            P.presets.draw(self.layout)
-        row = self.layout.row(align=True)
-        try:
-            prefs = context.preferences.addons[__package__].preferences
-            row.prop(prefs, "show_help_buttons", icon='QUESTION')
-        except Exception as _exc:
-            support.note(_exc)
-        upgrade_hearts(row, context)
+        _settings_section(self.layout, context)
         col = self.layout.column(align=True)
         col.prop(context.scene, "orivot_flip_left_right", text="Swap Left / Right labels")
         col.prop(context.scene, "orivot_show_mode_indicator", text="Mode indicator in viewport")

@@ -52,6 +52,7 @@ try:
 except ImportError:
     orient = None
 from . import common
+from . import geo
 from . import support
 
 
