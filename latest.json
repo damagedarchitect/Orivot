@@ -1,4 +1,4 @@
 {
-  "version": "4.3.3",
-  "notes": "Faster batch snapping of many objects; fixes in the paid editions."
+  "version": "4.3.5",
+  "notes": "Front is now -Y, as in Blender: every snap follows the Front Face Axis; a Fix button switches old +Y files."
 }

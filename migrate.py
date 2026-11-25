@@ -238,6 +238,166 @@ def migrate_all():
     return n
 
 
+# ---------------- 4.3.5: front is -Y (Blender's convention) ----------------
+# Up to 4.3.4 the default front was +Y, so a stored +Y almost always means "the default",
+# not a choice. Files are NOT changed on load: the Origin Snaps panel shows a warning and a
+# Fix button (ORIVOT_OT_fix_front_axis) while a file still holds old +Y data. Everything
+# written by 4.3.5 carries the axis convention (AXIS_REV), so a +Y picked on purpose later
+# is never reported or converted. The preferences (not file data) are converted once.
+_OLD_FRONT = 'LOCAL_Y_POS'
+_NEW_FRONT = 'LOCAL_Y_NEG'
+_REV = 1                                     # common.AXIS_REV
+_old_count = None                            # cached scan, None = scan again
+
+
+def _old_object(ob):
+    return (ob.library is None and ob.override_library is None
+            and ob.get('orivot_front_axis') == _OLD_FRONT
+            and ob.get('orivot_front_axis_rev', 0) < _REV)
+
+
+def _old_configs(coll):
+    return [c for c in (coll or ()) if getattr(c, "axis_rev", _REV) < _REV
+            and c.front_axis == _OLD_FRONT]
+
+
+def _scan():
+    n = sum(1 for ob in bpy.data.objects if _old_object(ob))
+    for sc in bpy.data.scenes:
+        if sc.library is None:
+            n += len(_old_configs(getattr(sc, 'orivot_configs', None)))
+    return n
+
+
+def old_front_axis_count():
+    """How many objects / saved configurations in this file still use the 4.3.4 front
+    (+Y). Cached; rescanned after load, undo / redo and the Fix button."""
+    global _old_count
+    if _old_count is None:
+        try:
+            _old_count = _scan()
+        except Exception as exc:
+            support.note(exc)
+            _old_count = 0
+    return _old_count
+
+
+@persistent
+def _invalidate(*_):
+    global _old_count
+    _old_count = None
+
+
+def _convert_configs(coll):
+    n = 0
+    for cfg in coll or ():
+        if getattr(cfg, "axis_rev", _REV) >= _REV:
+            continue
+        if cfg.front_axis == _OLD_FRONT:
+            cfg.front_axis = _NEW_FRONT
+            n += 1
+        cfg.axis_rev = _REV
+    return n
+
+
+def migrate_front_axis():
+    """Objects pinned to the old +Y default and this file's Saved Configurations -> -Y,
+    then every scene's Front dropdown follows its active object. Returns how many changed."""
+    n = 0
+    for ob in bpy.data.objects:
+        if ob.library is not None or ob.override_library is not None:
+            continue
+        if 'orivot_front_axis' not in ob or ob.get('orivot_front_axis_rev', 0) >= _REV:
+            continue
+        if ob.get('orivot_front_axis') == _OLD_FRONT:
+            ob['orivot_front_axis'] = _NEW_FRONT
+            n += 1
+        ob['orivot_front_axis_rev'] = _REV
+    for sc in bpy.data.scenes:
+        if sc.library is None:
+            n += _convert_configs(getattr(sc, 'orivot_configs', None))
+    _sync_scene_front_axes()
+    _invalidate()
+    if n:
+        print(f"[Orivot] front is now -Y (Blender's convention): converted {n} item(s) "
+              f"that used the old +Y default")
+    return n
+
+
+def _sync_scene_front_axes():
+    """Each scene's Front dropdown = its active object's pinned axis, else the default
+    (the dropdown is per active object; a file saved by 4.3.4 stored +Y there)."""
+    from . import common
+    for sc in bpy.data.scenes:
+        if sc.library is not None or not hasattr(sc, 'orivot_front_axis'):
+            continue
+        try:
+            act = sc.view_layers[0].objects.active if sc.view_layers else None
+            want = common.get_obj_front_axis(act, sc) if act else common.default_front_axis()
+            if sc.orivot_front_axis != want:
+                sc.orivot_front_axis = want
+        except Exception as exc:
+            support.note(exc)
+
+
+class ORIVOT_OT_fix_front_axis(bpy.types.Operator):
+    """Switch this file to Blender's front (-Y): objects pinned to the old Orivot front (+Y)
+    and Saved Configurations that stored it get -Y. Other pinned axes are kept"""
+    bl_idname = "orivot.fix_front_axis"
+    bl_label = "Fix Front Axis (-Y)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if old_front_axis_count():
+            return True
+        cls.poll_message_set("Nothing to fix: this file already uses Blender's front (-Y)")
+        return False
+
+    def execute(self, context):
+        n = migrate_front_axis()
+        for area in context.screen.areas if context.screen else ():
+            area.tag_redraw()
+        self.report({'INFO'}, f"Orivot: front is now -Y (Blender's convention), "
+                              f"{n} item(s) switched from +Y")
+        return {'FINISHED'}
+
+
+def draw_front_axis_warning(layout):
+    """The warning + Fix button in Origin Snaps while the file holds old +Y data."""
+    n = old_front_axis_count()
+    if not n:
+        return
+    box = layout.box()
+    col = box.column(align=True)
+    col.alert = True
+    col.label(text=f"Old Orivot front (+Y) on {n} item(s)", icon='ERROR')
+    col.alert = False
+    col.label(text="Blender's front is -Y. Orivot 4.3.5 follows it.")
+    box.operator("orivot.fix_front_axis", text="Fix: Front = -Y", icon='CHECKMARK')
+
+
+def migrate_front_axis_prefs():
+    """The preferences' default Front Face Axis and All-Files configurations, once."""
+    try:
+        p = bpy.context.preferences.addons[__package__].preferences
+    except Exception:
+        return 0
+    if getattr(p, 'axis_rev', _REV) >= _REV:
+        return 0
+    n = 0
+    if getattr(p, 'default_front_axis', None) == _OLD_FRONT:
+        p.default_front_axis = _NEW_FRONT
+        n += 1
+    n += _convert_configs(getattr(p, 'configs', None))
+    p.axis_rev = _REV
+    try:
+        bpy.context.preferences.is_dirty = True
+    except Exception:
+        pass
+    return n
+
+
 @persistent
 def _on_load(*_):
     try:
@@ -245,9 +405,18 @@ def _on_load(*_):
     except Exception as exc:
         support.note(exc)
         print(f"[Orivot] PivotForge data migration skipped: {exc!r}")
+    _invalidate()
+    try:
+        _sync_scene_front_axes()
+    except Exception as exc:
+        support.note(exc)
 
 
 def _first():
+    try:
+        migrate_front_axis_prefs()          # before the scenes take the default from it
+    except Exception as exc:
+        support.note(exc)
     _on_load()
     return None
 
@@ -255,12 +424,18 @@ def _first():
 def register():
     if _on_load not in bpy.app.handlers.load_post:
         bpy.app.handlers.load_post.append(_on_load)
+    for _lst in (bpy.app.handlers.undo_post, bpy.app.handlers.redo_post):
+        if _invalidate not in _lst:
+            _lst.append(_invalidate)
     bpy.app.timers.register(_first, first_interval=0.3)
 
 
 def unregister():
     if _on_load in bpy.app.handlers.load_post:
         bpy.app.handlers.load_post.remove(_on_load)
+    for _lst in (bpy.app.handlers.undo_post, bpy.app.handlers.redo_post):
+        if _invalidate in _lst:
+            _lst.remove(_invalidate)
     try:
         if bpy.app.timers.is_registered(_first):
             bpy.app.timers.unregister(_first)

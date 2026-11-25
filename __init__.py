@@ -4,9 +4,9 @@ bl_info = {
     "category": "Object",
     "description": ("Origin snapping to 39 exact points on any mesh: extreme sides, corners, edge midpoints, face centres and geometry / bounding-box / mass centres, plus 3D Cursor, World Zero and an Alt+Q pie menu."),
     "author": "DaMagedArchitect",
-    "version": (4, 3, 3),
-    "doc_url": "https://discord.com/users/damagedarchitect",
-    "tracker_url": "https://discord.com/users/damagedarchitect",
+    "version": (4, 3, 5),
+    "doc_url": "https://github.com/damagedarchitect/Orivot#readme",
+    "tracker_url": "https://github.com/damagedarchitect/Orivot/issues",
 }
 
 
@@ -183,6 +183,7 @@ from .menus import (
 from .op_origin import (
     ORIVOT_OT_set_origin_extreme_full,
 )
+from .migrate import ORIVOT_OT_fix_front_axis   # 4.3.5: old +Y front -> -Y
 from .op_tools import (
     OrivotProNamedGroup,
 )
@@ -222,63 +223,6 @@ def _pkg():
     return sys.modules[__name__]
 
 
-class ORIVOT_OT_open_upgrade(bpy.types.Operator):
-    """Open the Orivot store page for the next edition"""
-    bl_idname = "orivot.open_upgrade"
-    bl_label = "Get Orivot"
-    bl_options = {'INTERNAL'}
-
-    edition: bpy.props.EnumProperty(items=[('BASIC', "Basic", ""), ('PRO', "Pro", ""),
-                                           ('FAB', "Fabricator", "")],
-                                    default='PRO', options={'SKIP_SAVE'})
-    dismiss: bpy.props.BoolProperty(default=False, options={'SKIP_SAVE', 'HIDDEN'},
-                                    description="Hide this heart from the sidebar for good")
-
-    @classmethod
-    def description(cls, context, properties):
-        price = tier.price_text(properties.edition) if hasattr(tier, "price_text") else ""
-        return cls._features(properties) + (f"\n\nPrice: {price}" if price else "")
-
-    @classmethod
-    def _features(cls, properties):
-        if properties.edition == 'BASIC':
-            return ("Orivot Basic adds:\n"
-                    "\u2022 Surface / Vertex snap (Alt+click on the mesh)\n"
-                    "\u2022 Clickable bounding-box handles\n"
-                    "\u2022 Live preview of the next snap\n"
-                    "\u2022 Multi-Object, Offset & Freeze\n"
-                    "\u2022 Copy / Paste origin, Mirror Plane, Snap to Grid\n"
-                    "\u2022 3D Cursor tools, 3D-print prep, scene health report")
-        if properties.edition == 'FAB':
-            return ((("Orivot Fabricator adds everything in Pro, plus:\n")) +
-                    "\u2022 CNC cut files (DXF / SVG) with kerf, reliefs, true arcs\n"
-                    "\u2022 Nesting on sheets, cut lists, part IDs\n"
-                    "\u2022 Plans, elevations and sections (DXF / SVG / PDF)\n"
-                    "\u2022 Dimensions and title blocks in the drawings\n"
-                    "\u2022 Area and material schedules (CSV / XLSX)\n"
-                    "\u2022 Assembly: flat-pack, mates, datums")
-        return ((("Orivot Pro adds everything in Basic, plus:\n")) +
-                "\u2022 Along Curve, Origin Axes, Pivot Library\n"
-                "\u2022 Object Snaps: snap, drop, align, rotate\n"
-                "\u2022 Line Snap and Axis Transform (Edit Mode)\n"
-                "\u2022 Grids and levels, smart distribute, relations\n"
-                "\u2022 Collision and clearance checks, Chain\n"
-                "\u2022 Instance, site and import tools, Saved Configurations")
-
-    def execute(self, context):
-        url = {'BASIC': getattr(tier, "URL_BASIC", ""), 'PRO': getattr(tier, "URL_PRO", ""),
-               'FAB': getattr(tier, "URL_FAB", "")}[self.edition]
-        if url:
-            bpy.ops.wm.url_open(url=url)
-        if self.dismiss:            # Pro's one-time sidebar heart: never shown again
-            try:
-                context.preferences.addons[__name__].preferences.fab_heart_seen = True
-                context.preferences.is_dirty = True
-            except Exception as _exc:
-                support.note(_exc)
-        return {'FINISHED'}
-
-
 # What each edition registers (see tier.py). Property groups are data types every
 # edition needs (preferences and scenes store them), so they are always registered.
 FREE_CLASSES = (
@@ -289,6 +233,7 @@ FREE_CLASSES = (
     ORIVOT_OT_apply_preference_defaults,
     ORIVOT_OT_reset_pie_defaults,
     ORIVOT_OT_set_origin_extreme_full,
+    ORIVOT_OT_fix_front_axis,
     ORIVOT_OT_snap_to_world_zero,
     ORIVOT_OT_ground,
     ORIVOT_OT_show_shortcuts_info,
@@ -311,7 +256,7 @@ PRO_CLASSES = ()
 classes = (FREE_CLASSES
            + ((()))
            + ((()))
-           + (((ORIVOT_OT_open_upgrade,))))
+           + ((())))
 
 
 def menu_func(self, context):

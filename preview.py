@@ -196,9 +196,9 @@ def draw_outliner_axis_indicators():
     """POST_PIXEL callback on the Outliner: draw a small coloured dot next to
     each object whose committed front-axis is non-default.
 
-    The dot colour matches the axis: +Y (default) → grey (suppressed), -Y → cyan,
+    The dot colour matches the axis: -Y (default) → grey (suppressed), +Y → cyan,
     +Z → green, -Z → magenta, +X → orange, -X → blue.  A grey dot would clutter
-    the outliner, so objects using the Blender-default LOCAL_Y_POS get nothing.
+    the outliner, so objects using the Blender-default LOCAL_Y_NEG get nothing.
 
     The callback is very cheap: it only fires when the Outliner is redrawn
     (user scrolling, scene change) and does a single font.draw() per marked object
@@ -212,22 +212,22 @@ def draw_outliner_axis_indicators():
         # Only run when objects carry the custom prop
         marked = {}
         for obj in bpy.data.objects:
-            fa = obj.get('orivot_front_axis', 'LOCAL_Y_POS')
-            if fa and fa != 'LOCAL_Y_POS':
+            fa = obj.get('orivot_front_axis')
+            if fa and fa != common.DEFAULT_FRONT_AXIS:
                 marked[obj.name] = fa
 
         if not marked:
             return
 
         AXIS_COLORS = {
-            'LOCAL_Y_NEG': (0.2, 0.9, 0.9, 1.0),   # cyan
+            'LOCAL_Y_POS': (0.2, 0.9, 0.9, 1.0),   # cyan
             'LOCAL_Z_POS': (0.4, 0.9, 0.2, 1.0),   # green
             'LOCAL_Z_NEG': (0.9, 0.2, 0.8, 1.0),   # magenta
             'LOCAL_X_POS': (1.0, 0.55, 0.1, 1.0),  # orange
             'LOCAL_X_NEG': (0.2, 0.5,  1.0, 1.0),  # blue
         }
         AXIS_LABELS = {
-            'LOCAL_Y_NEG': '−Y', 'LOCAL_Z_POS': '+Z', 'LOCAL_Z_NEG': '−Z',
+            'LOCAL_Y_POS': '+Y', 'LOCAL_Z_POS': '+Z', 'LOCAL_Z_NEG': '−Z',
             'LOCAL_X_POS': '+X', 'LOCAL_X_NEG': '−X',
         }
 
@@ -319,7 +319,7 @@ def _sync_active_ui():
         ctx = bpy.context
         scene = ctx.scene
         obj = ctx.view_layer.objects.active if ctx.view_layer else None
-        committed = common.get_obj_front_axis(obj, scene) if obj else 'LOCAL_Y_POS'
+        committed = common.get_obj_front_axis(obj, scene) if obj else common.default_front_axis()
         if scene.orivot_front_axis != committed:
             scene.orivot_front_axis = committed
         if obj and obj.type == 'MESH' and \

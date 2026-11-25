@@ -88,26 +88,28 @@ def menu_draw_handler(self, context):
     
 
 
+def _snap_items(layout, scene, modes):
+    """One menu entry per snap mode, labelled with the sides and the axes they are on for
+    the current Front Face Axis (4.3.5: Blender's front is -Y). None = separator."""
+    from . import common
+    for mode in modes:
+        if mode is None:
+            layout.separator()
+            continue
+        words = " ".join(s.title() for s in common.mode_sides(mode))
+        layout.operator("orivot.set_origin_extreme_full",
+                        text=f"{words} ({common.mode_axis_text(mode, scene)})").mode = mode
+
+
+_SIDES6 = ('TOP', 'BOTTOM', 'LEFT', 'RIGHT', 'FRONT', 'BACK')
+
+
 class VIEW3D_MT_set_origin_faces(bpy.types.Menu):
     bl_label = "Faces (Geometry)"
 
     def draw(self, context):
         menu_draw_handler(self, context)
-        layout = self.layout
-        scene = context.scene
-
-        layout.operator("orivot.set_origin_extreme_full", text="Top (+Z)").mode = 'FACE_TOP'
-        layout.operator("orivot.set_origin_extreme_full", text="Bottom (-Z)").mode = 'FACE_BOTTOM'
-
-        if scene.orivot_flip_left_right:
-            layout.operator("orivot.set_origin_extreme_full", text="Left (+X)").mode = 'FACE_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Right (-X)").mode = 'FACE_RIGHT'
-        else:
-            layout.operator("orivot.set_origin_extreme_full", text="Left (-X)").mode = 'FACE_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Right (+X)").mode = 'FACE_RIGHT'
-
-        layout.operator("orivot.set_origin_extreme_full", text="Front (+Y)").mode = 'FACE_FRONT'
-        layout.operator("orivot.set_origin_extreme_full", text="Back (-Y)").mode = 'FACE_BACK'
+        _snap_items(self.layout, context.scene, [f"FACE_{s}" for s in _SIDES6])
 
 
 class VIEW3D_MT_set_origin_vertices(bpy.types.Menu):
@@ -115,74 +117,28 @@ class VIEW3D_MT_set_origin_vertices(bpy.types.Menu):
 
     def draw(self, context):
         menu_draw_handler(self, context)
-        layout = self.layout
-        scene = context.scene
-
-        if scene.orivot_flip_left_right:
-            layout.operator("orivot.set_origin_extreme_full", text="Top Left Front (+X+Y+Z)").mode = 'VERT_TLF'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Right Front (-X+Y+Z)").mode = 'VERT_TRF'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Left Back (+X-Y+Z)").mode = 'VERT_TLB'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Right Back (-X-Y+Z)").mode = 'VERT_TRB'
-            layout.separator()
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Left Front (+X+Y-Z)").mode = 'VERT_BLF'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Right Front (-X+Y-Z)").mode = 'VERT_BRF'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Left Back (+X-Y-Z)").mode = 'VERT_BLB'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Right Back (-X-Y-Z)").mode = 'VERT_BRB'
-        else:
-            layout.operator("orivot.set_origin_extreme_full", text="Top Left Front (-X+Y+Z)").mode = 'VERT_TLF'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Right Front (+X+Y+Z)").mode = 'VERT_TRF'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Left Back (-X-Y+Z)").mode = 'VERT_TLB'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Right Back (+X-Y+Z)").mode = 'VERT_TRB'
-            layout.separator()
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Left Front (-X+Y-Z)").mode = 'VERT_BLF'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Right Front (+X+Y-Z)").mode = 'VERT_BRF'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Left Back (-X-Y-Z)").mode = 'VERT_BLB'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Right Back (+X-Y-Z)").mode = 'VERT_BRB'
+        _snap_items(self.layout, context.scene,
+                    ['VERT_TLF', 'VERT_TRF', 'VERT_TLB', 'VERT_TRB', None,
+                     'VERT_BLF', 'VERT_BRF', 'VERT_BLB', 'VERT_BRB'])
 
 
 class VIEW3D_MT_set_origin_edges(bpy.types.Menu):
     bl_label = "Edge Midpoints (12)"
 
     def draw(self, context):
+        from . import common
         menu_draw_handler(self, context)
         layout = self.layout
         scene = context.scene
-
-        layout.label(text="Top ring (+Z)")
-        if scene.orivot_flip_left_right:
-            layout.operator("orivot.set_origin_extreme_full", text="Top Left (+X)").mode = 'EDGE_TOP_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Right (-X)").mode = 'EDGE_TOP_RIGHT'
-        else:
-            layout.operator("orivot.set_origin_extreme_full", text="Top Left (-X)").mode = 'EDGE_TOP_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Top Right (+X)").mode = 'EDGE_TOP_RIGHT'
-
-        layout.operator("orivot.set_origin_extreme_full", text="Top Front (+Y)").mode = 'EDGE_TOP_FRONT'
-        layout.operator("orivot.set_origin_extreme_full", text="Top Back (-Y)").mode = 'EDGE_TOP_BACK'
+        ax = common.side_labels(scene)
+        layout.label(text=f"Top ring ({ax['TOP']})")
+        _snap_items(layout, scene, ['EDGE_TOP_LEFT', 'EDGE_TOP_RIGHT', 'EDGE_TOP_FRONT', 'EDGE_TOP_BACK'])
         layout.separator()
-
-        layout.label(text="Bottom ring (-Z)")
-        if scene.orivot_flip_left_right:
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Left (+X)").mode = 'EDGE_BOT_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Right (-X)").mode = 'EDGE_BOT_RIGHT'
-        else:
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Left (-X)").mode = 'EDGE_BOT_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Bottom Right (+X)").mode = 'EDGE_BOT_RIGHT'
-
-        layout.operator("orivot.set_origin_extreme_full", text="Bottom Front (+Y)").mode = 'EDGE_BOT_FRONT'
-        layout.operator("orivot.set_origin_extreme_full", text="Bottom Back (-Y)").mode = 'EDGE_BOT_BACK'
+        layout.label(text=f"Bottom ring ({ax['BOTTOM']})")
+        _snap_items(layout, scene, ['EDGE_BOT_LEFT', 'EDGE_BOT_RIGHT', 'EDGE_BOT_FRONT', 'EDGE_BOT_BACK'])
         layout.separator()
-
         layout.label(text="Middle edges")
-        if scene.orivot_flip_left_right:
-            layout.operator("orivot.set_origin_extreme_full", text="Front Left (+X+Y)").mode = 'EDGE_FRONT_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Front Right (-X+Y)").mode = 'EDGE_FRONT_RIGHT'
-            layout.operator("orivot.set_origin_extreme_full", text="Back Left (+X-Y)").mode = 'EDGE_BACK_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Back Right (-X-Y)").mode = 'EDGE_BACK_RIGHT'
-        else:
-            layout.operator("orivot.set_origin_extreme_full", text="Front Left (-X+Y)").mode = 'EDGE_FRONT_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Front Right (+X+Y)").mode = 'EDGE_FRONT_RIGHT'
-            layout.operator("orivot.set_origin_extreme_full", text="Back Left (-X-Y)").mode = 'EDGE_BACK_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Back Right (+X-Y)").mode = 'EDGE_BACK_RIGHT'
+        _snap_items(layout, scene, ['EDGE_FRONT_LEFT', 'EDGE_FRONT_RIGHT', 'EDGE_BACK_LEFT', 'EDGE_BACK_RIGHT'])
 
 
 class VIEW3D_MT_set_origin_centers(bpy.types.Menu):
@@ -190,21 +146,7 @@ class VIEW3D_MT_set_origin_centers(bpy.types.Menu):
 
     def draw(self, context):
         menu_draw_handler(self, context)
-        layout = self.layout
-        scene = context.scene
-
-        layout.operator("orivot.set_origin_extreme_full", text="Top (+Z)").mode = 'CENTER_TOP'
-        layout.operator("orivot.set_origin_extreme_full", text="Bottom (-Z)").mode = 'CENTER_BOTTOM'
-
-        if scene.orivot_flip_left_right:
-            layout.operator("orivot.set_origin_extreme_full", text="Left (+X)").mode = 'CENTER_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Right (-X)").mode = 'CENTER_RIGHT'
-        else:
-            layout.operator("orivot.set_origin_extreme_full", text="Left (-X)").mode = 'CENTER_LEFT'
-            layout.operator("orivot.set_origin_extreme_full", text="Right (+X)").mode = 'CENTER_RIGHT'
-
-        layout.operator("orivot.set_origin_extreme_full", text="Front (+Y)").mode = 'CENTER_FRONT'
-        layout.operator("orivot.set_origin_extreme_full", text="Back (-Y)").mode = 'CENTER_BACK'
+        _snap_items(self.layout, context.scene, [f"CENTER_{s}" for s in _SIDES6])
 
 
 class VIEW3D_MT_set_origin_main(bpy.types.Menu):

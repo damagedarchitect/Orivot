@@ -66,26 +66,21 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
             finally:
                 sc['_orivot_suppress_offset_update'] = False
 
-    def _center_axis(self, scene):
-        flip = scene.orivot_flip_left_right
-        return {
-            'CENTER_TOP': ('Z', 'max'), 'CENTER_BOTTOM': ('Z', 'min'),
-            'CENTER_FRONT': ('Y', 'max'), 'CENTER_BACK': ('Y', 'min'),
-            'CENTER_LEFT': ('X', 'min' if flip else 'max'),
-            'CENTER_RIGHT': ('X', 'max' if flip else 'min'),
-        }[self.mode]
+    def _frame(self, scene, obj=None):
+        """Named side -> (axis, 'max'/'min') for this snap (4.3.5: follows the Front Face
+        Axis; Blender's front is -Y). obj None = the dropdown (Combined, world axes)."""
+        act = bpy.context.view_layer.objects.active if bpy.context.view_layer else None
+        return common.scene_side_frame(scene, obj, act)
 
-    def _edge_params(self, scene):
-        flip = scene.orivot_flip_left_right
-        L, R = ('min' if flip else 'max'), ('max' if flip else 'min')
-        return {
-            'EDGE_TOP_LEFT': ('Z', 'max', 'X', L), 'EDGE_TOP_RIGHT': ('Z', 'max', 'X', R),
-            'EDGE_TOP_FRONT': ('Z', 'max', 'Y', 'max'), 'EDGE_TOP_BACK': ('Z', 'max', 'Y', 'min'),
-            'EDGE_BOT_LEFT': ('Z', 'min', 'X', L), 'EDGE_BOT_RIGHT': ('Z', 'min', 'X', R),
-            'EDGE_BOT_FRONT': ('Z', 'min', 'Y', 'max'), 'EDGE_BOT_BACK': ('Z', 'min', 'Y', 'min'),
-            'EDGE_FRONT_LEFT': ('Y', 'max', 'X', L), 'EDGE_FRONT_RIGHT': ('Y', 'max', 'X', R),
-            'EDGE_BACK_LEFT': ('Y', 'min', 'X', L), 'EDGE_BACK_RIGHT': ('Y', 'min', 'X', R),
-        }.get(self.mode)
+    def _center_axis(self, scene, obj=None):
+        return self._frame(scene, obj)[common.mode_sides(self.mode)[0]]
+
+    def _edge_params(self, scene, obj=None):
+        sides = common.mode_sides(self.mode)
+        if self.mode.startswith("EDGE_") and len(sides) == 2:
+            fr = self._frame(scene, obj)
+            return fr[sides[0]] + fr[sides[1]]
+        return None
 
     def _note_landing(self, obj, raw, final):
         d = Vector(final) - Vector(raw)
@@ -212,17 +207,13 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
                     pass  # intentional: try:
 
         # Store face normal for Normal Offset (face/center ops have well-defined normals)
-        _FACE_NORMALS_LOCAL = {
-            'FACE_TOP':    Vector(( 0,  0,  1)), 'CENTER_TOP':    Vector(( 0,  0,  1)),
-            'FACE_BOTTOM': Vector(( 0,  0, -1)), 'CENTER_BOTTOM': Vector(( 0,  0, -1)),
-            'FACE_FRONT':  Vector(( 0,  1,  0)), 'CENTER_FRONT':  Vector(( 0,  1,  0)),
-            'FACE_BACK':   Vector(( 0, -1,  0)), 'CENTER_BACK':   Vector(( 0, -1,  0)),
-            'FACE_LEFT':   Vector((-1,  0,  0)), 'CENTER_LEFT':   Vector((-1,  0,  0)),
-            'FACE_RIGHT':  Vector(( 1,  0,  0)), 'CENTER_RIGHT':  Vector(( 1,  0,  0)),
-        }
-        if self.mode in _FACE_NORMALS_LOCAL:
-            normal_local = _FACE_NORMALS_LOCAL[self.mode]
+        sides = common.mode_sides(self.mode)
+        if len(sides) == 1 and self.mode.split("_")[0] in ('FACE', 'CENTER'):
+            act = context.view_layer.objects.active
+            flip = scene.orivot_flip_left_right
             for aobj in affected_objects:
+                fa = common.front_axis_for(aobj, scene, act)
+                normal_local = common.side_vectors(fa, flip)[sides[0]]
                 if scene.orivot_preview_orientation == 'LOCAL':
                     nw = geo.normal_to_world(aobj.matrix_world, normal_local)
                 else:
@@ -278,12 +269,9 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
             finally:
                 self.mode = saved
 
-        face_axis = {
-            'FACE_TOP': ('Z', 'max'), 'FACE_BOTTOM': ('Z', 'min'),
-            'FACE_FRONT': ('Y', 'max'), 'FACE_BACK': ('Y', 'min'),
-            'FACE_LEFT': ('X', 'min' if scene.orivot_flip_left_right else 'max'),
-            'FACE_RIGHT': ('X', 'max' if scene.orivot_flip_left_right else 'min'),
-        }
+        face_axis = {}
+        if self.mode.startswith("FACE_"):
+            face_axis[self.mode] = self._frame(scene)[common.mode_sides(self.mode)[0]]
         if self.mode in face_axis:
             if source == 'MESH':
                 axis, ext = face_axis[self.mode]
@@ -309,67 +297,10 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
 
     def get_combined_ideal_world(self, scene, min_x, max_x, min_y, max_y, min_z, max_z, xmid, ymid, zmid):
         """Get ideal world position for combined bounding box based on mode."""
-        flip = scene.orivot_flip_left_right
-
-        # VERTICES
-        if self.mode == 'VERT_TLF':
-            return Vector((min_x if flip else max_x, max_y, max_z))
-        elif self.mode == 'VERT_TRF':
-            return Vector((max_x if flip else min_x, max_y, max_z))
-        elif self.mode == 'VERT_TLB':
-            return Vector((min_x if flip else max_x, min_y, max_z))
-        elif self.mode == 'VERT_TRB':
-            return Vector((max_x if flip else min_x, min_y, max_z))
-        elif self.mode == 'VERT_BLF':
-            return Vector((min_x if flip else max_x, max_y, min_z))
-        elif self.mode == 'VERT_BRF':
-            return Vector((max_x if flip else min_x, max_y, min_z))
-        elif self.mode == 'VERT_BLB':
-            return Vector((min_x if flip else max_x, min_y, min_z))
-        elif self.mode == 'VERT_BRB':
-            return Vector((max_x if flip else min_x, min_y, min_z))
-
-        # EDGES
-        elif self.mode == 'EDGE_TOP_LEFT':
-            return Vector((min_x if flip else max_x, ymid, max_z))
-        elif self.mode == 'EDGE_TOP_RIGHT':
-            return Vector((max_x if flip else min_x, ymid, max_z))
-        elif self.mode == 'EDGE_TOP_FRONT':
-            return Vector((xmid, max_y, max_z))
-        elif self.mode == 'EDGE_TOP_BACK':
-            return Vector((xmid, min_y, max_z))
-        elif self.mode == 'EDGE_BOT_LEFT':
-            return Vector((min_x if flip else max_x, ymid, min_z))
-        elif self.mode == 'EDGE_BOT_RIGHT':
-            return Vector((max_x if flip else min_x, ymid, min_z))
-        elif self.mode == 'EDGE_BOT_FRONT':
-            return Vector((xmid, max_y, min_z))
-        elif self.mode == 'EDGE_BOT_BACK':
-            return Vector((xmid, min_y, min_z))
-        elif self.mode == 'EDGE_FRONT_LEFT':
-            return Vector((min_x if flip else max_x, max_y, zmid))
-        elif self.mode == 'EDGE_FRONT_RIGHT':
-            return Vector((max_x if flip else min_x, max_y, zmid))
-        elif self.mode == 'EDGE_BACK_LEFT':
-            return Vector((min_x if flip else max_x, min_y, zmid))
-        elif self.mode == 'EDGE_BACK_RIGHT':
-            return Vector((max_x if flip else min_x, min_y, zmid))
-
-        # CENTERS
-        elif self.mode == 'CENTER_TOP':
-            return Vector((xmid, ymid, max_z))
-        elif self.mode == 'CENTER_BOTTOM':
-            return Vector((xmid, ymid, min_z))
-        elif self.mode == 'CENTER_LEFT':
-            return Vector((min_x if flip else max_x, ymid, zmid))
-        elif self.mode == 'CENTER_RIGHT':
-            return Vector((max_x if flip else min_x, ymid, zmid))
-        elif self.mode == 'CENTER_FRONT':
-            return Vector((xmid, max_y, zmid))
-        elif self.mode == 'CENTER_BACK':
-            return Vector((xmid, min_y, zmid))
-
-        return None
+        sides = common.mode_sides(self.mode)
+        if not sides or self.mode.startswith("FACE_"):
+            return None
+        return common.side_point(sides, (min_x, min_y, min_z), (max_x, max_y, max_z), self._frame(scene))
 
     def calculate_single_extreme(self, obj, source, context):
         """Calculate extreme for a single object."""
@@ -397,127 +328,48 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
 
         target_world = None
 
-        # --- Faces ---
-        if self.mode == "FACE_TOP":
+        lo = (min_x_local.x, min_y_local.y, min_z_local.z)
+        hi = (max_x_local.x, max_y_local.y, max_z_local.z)
+        sides = common.mode_sides(self.mode)
+        frame = self._frame(scene, obj) if sides else None
+
+        # --- Faces: centroid of the polygons on that side (Mesh), box face centre (BBox) ---
+        if self.mode.startswith("FACE_") and sides:
+            fallback = common.local_to_world(obj, common.side_point(sides, lo, hi, frame))
             if source == 'MESH':
-                t = common.face_centroid_extreme(obj, 'Z', 'max')
-                target_world = t if t is not None else common.local_to_world(obj,
-                                                                      Vector((xmid_local, ymid_local, max_z_local.z)))
+                axis, ext = frame[sides[0]]
+                t = common.face_centroid_extreme(obj, axis, ext)
+                target_world = t if t is not None else fallback
             else:
-                target_world = common.local_to_world(obj, Vector((xmid_local, ymid_local, max_z_local.z)))
-
-        elif self.mode == "FACE_BOTTOM":
-            if source == 'MESH':
-                t = common.face_centroid_extreme(obj, 'Z', 'min')
-                target_world = t if t is not None else common.local_to_world(obj,
-                                                                      Vector((xmid_local, ymid_local, min_z_local.z)))
-            else:
-                target_world = common.local_to_world(obj, Vector((xmid_local, ymid_local, min_z_local.z)))
-
-        elif self.mode == "FACE_LEFT":
-            if scene.orivot_flip_left_right:
-                if source == 'MESH':
-                    t = common.face_centroid_extreme(obj, 'X', 'min')
-                    target_world = t if t is not None else common.local_to_world(obj, Vector(
-                        (min_x_local.x, ymid_local, zmid_local)))
-                else:
-                    target_world = common.local_to_world(obj, Vector((min_x_local.x, ymid_local, zmid_local)))
-            else:
-                if source == 'MESH':
-                    t = common.face_centroid_extreme(obj, 'X', 'max')
-                    target_world = t if t is not None else common.local_to_world(obj, Vector(
-                        (max_x_local.x, ymid_local, zmid_local)))
-                else:
-                    target_world = common.local_to_world(obj, Vector((max_x_local.x, ymid_local, zmid_local)))
-
-        elif self.mode == "FACE_RIGHT":
-            if scene.orivot_flip_left_right:
-                if source == 'MESH':
-                    t = common.face_centroid_extreme(obj, 'X', 'max')
-                    target_world = t if t is not None else common.local_to_world(obj, Vector(
-                        (max_x_local.x, ymid_local, zmid_local)))
-                else:
-                    target_world = common.local_to_world(obj, Vector((max_x_local.x, ymid_local, zmid_local)))
-            else:
-                if source == 'MESH':
-                    t = common.face_centroid_extreme(obj, 'X', 'min')
-                    target_world = t if t is not None else common.local_to_world(obj, Vector(
-                        (min_x_local.x, ymid_local, zmid_local)))  # Use min_x for fallback
-                else:
-                    target_world = common.local_to_world(obj, Vector((min_x_local.x, ymid_local, zmid_local)))  # Use min_x for bbox
-
-        elif self.mode == "FACE_FRONT":
-            if source == 'MESH':
-                t = common.face_centroid_extreme(obj, 'Y', 'max')
-                target_world = t if t is not None else common.local_to_world(obj,
-                                                                      Vector((xmid_local, max_y_local.y, zmid_local)))
-            else:
-                target_world = common.local_to_world(obj, Vector((xmid_local, max_y_local.y, zmid_local)))
-
-        elif self.mode == "FACE_BACK":
-            if source == 'MESH':
-                t = common.face_centroid_extreme(obj, 'Y', 'min')
-                target_world = t if t is not None else common.local_to_world(obj,
-                                                                      Vector((xmid_local, min_y_local.y, zmid_local)))
-            else:
-                target_world = common.local_to_world(obj, Vector((xmid_local, min_y_local.y, zmid_local)))
+                target_world = fallback
 
         # --- Vertices ---
-        elif self.mode.startswith("VERT_"):
-            ideal_local = self.get_vertex_ideal_local(scene, min_x_local, max_x_local, min_y_local, max_y_local,
-                                                        min_z_local, max_z_local)
+        elif self.mode.startswith("VERT_") and sides:
+            ideal_local = common.side_point(sides, lo, hi, frame)
             if source == 'MESH':
                 t = meshnp.closest_vertex_world(obj, ideal_local)
                 target_world = t if t is not None else common.local_to_world(obj, ideal_local)
             else:
                 target_world = common.local_to_world(obj, ideal_local)
 
-                # --- Edges ---
-        elif self.mode.startswith("EDGE_"):
-            ideal_local = self.get_edge_ideal_local(scene, min_x_local, max_x_local, min_y_local, max_y_local,
-                                                        min_z_local, max_z_local, xmid_local, ymid_local, zmid_local)
+        # --- Edges: Mesh = mean of the vertices on both extremes, BBox = box edge middle ---
+        elif self.mode.startswith("EDGE_") and sides:
+            ideal_local = common.side_point(sides, lo, hi, frame)
             if source == 'MESH':
-                # In Mesh mode: find TRUE edge midpoint by averaging vertices at both extremes
-                flip = scene.orivot_flip_left_right
-                
-                # Map edge mode to axis extremes
-                edge_params = {
-                    # Top ring edges (Z=max)
-                    'EDGE_TOP_LEFT':    ('Z', 'max', 'X', 'min' if flip else 'max'),
-                    'EDGE_TOP_RIGHT':   ('Z', 'max', 'X', 'max' if flip else 'min'),
-                    'EDGE_TOP_FRONT':   ('Z', 'max', 'Y', 'max'),
-                    'EDGE_TOP_BACK':    ('Z', 'max', 'Y', 'min'),
-                    # Bottom ring edges (Z=min)
-                    'EDGE_BOT_LEFT':    ('Z', 'min', 'X', 'min' if flip else 'max'),
-                    'EDGE_BOT_RIGHT':   ('Z', 'min', 'X', 'max' if flip else 'min'),
-                    'EDGE_BOT_FRONT':   ('Z', 'min', 'Y', 'max'),
-                    'EDGE_BOT_BACK':    ('Z', 'min', 'Y', 'min'),
-                    # Vertical edges (X and Y extremes)
-                    'EDGE_FRONT_LEFT':  ('Y', 'max', 'X', 'min' if flip else 'max'),
-                    'EDGE_FRONT_RIGHT': ('Y', 'max', 'X', 'max' if flip else 'min'),
-                    'EDGE_BACK_LEFT':   ('Y', 'min', 'X', 'min' if flip else 'max'),
-                    'EDGE_BACK_RIGHT':  ('Y', 'min', 'X', 'max' if flip else 'min'),
-                }
-                
-                if self.mode in edge_params:
-                    axis1, extreme1, axis2, extreme2 = edge_params[self.mode]
-                    t = common.edge_midpoint_extreme(obj, axis1, extreme1, axis2, extreme2)
-                    target_world = t if t is not None else common.local_to_world(obj, ideal_local)
-                else:
-                    target_world = common.local_to_world(obj, ideal_local)
+                (a1, e1), (a2, e2) = frame[sides[0]], frame[sides[1]]
+                t = common.edge_midpoint_extreme(obj, a1, e1, a2, e2)
+                target_world = t if t is not None else common.local_to_world(obj, ideal_local)
             else:
-                # In BBox mode: use exact calculated midpoint position
                 target_world = common.local_to_world(obj, ideal_local)
 
-            # --- Centers ---
-        elif self.mode.startswith("CENTER_") and self.mode not in {"CENTER_GEOMETRY", "CENTER_BBOX", "CENTER_MASS"}:
-            ideal_local = self.get_center_ideal_local(scene, min_x_local, max_x_local, min_y_local, max_y_local,
-                                                      min_z_local, max_z_local, xmid_local, ymid_local, zmid_local)
+        # --- Centers ---
+        elif self.mode.startswith("CENTER_") and sides:
+            ideal_local = common.side_point(sides, lo, hi, frame)
             if source == 'MESH':
                 # Mesh: the point on the surface in the middle of that side (a ray through the
                 # box face centre). Up to 4.1 this took the vertex nearest the box face
                 # centre, so on a plain box "Top" landed on an arbitrary corner.
-                axis, ext = self._center_axis(scene)
+                axis, ext = frame[sides[0]]
                 t = meshnp.surface_center_world(obj, axis, ext)
                 target_world = t if t is not None else common.local_to_world(obj, ideal_local)
             else:
@@ -549,81 +401,21 @@ class ORIVOT_OT_set_origin_extreme_full(bpy.types.Operator):
 
         return target_world
 
-    def get_vertex_ideal_local(self, scene, min_x, max_x, min_y, max_y, min_z, max_z):
-        """Get ideal local position for vertex corners with flip support."""
-        flip = scene.orivot_flip_left_right
-
-        corner_map = {
-            'VERT_TLF': Vector((min_x.x if flip else max_x.x, max_y.y, max_z.z)),
-            'VERT_TRF': Vector((max_x.x if flip else min_x.x, max_y.y, max_z.z)),
-            'VERT_TLB': Vector((min_x.x if flip else max_x.x, min_y.y, max_z.z)),
-            'VERT_TRB': Vector((max_x.x if flip else min_x.x, min_y.y, max_z.z)),
-            'VERT_BLF': Vector((min_x.x if flip else max_x.x, max_y.y, min_z.z)),
-            'VERT_BRF': Vector((max_x.x if flip else min_x.x, max_y.y, min_z.z)),
-            'VERT_BLB': Vector((min_x.x if flip else max_x.x, min_y.y, min_z.z)),
-            'VERT_BRB': Vector((max_x.x if flip else min_x.x, min_y.y, min_z.z)),
-        }
-        return corner_map.get(self.mode, Vector((0, 0, 0)))
-
-    def get_edge_ideal_local(self, scene, min_x, max_x, min_y, max_y, min_z, max_z, xmid, ymid, zmid):
-        """Get ideal local position for edge midpoints with flip support."""
-        flip = scene.orivot_flip_left_right
-
-        edge_map = {
-            'EDGE_TOP_LEFT': Vector((min_x.x if flip else max_x.x, ymid, max_z.z)),
-            'EDGE_TOP_RIGHT': Vector((max_x.x if flip else min_x.x, ymid, max_z.z)),
-            'EDGE_TOP_FRONT': Vector((xmid, max_y.y, max_z.z)),
-            'EDGE_TOP_BACK': Vector((xmid, min_y.y, max_z.z)),
-            'EDGE_BOT_LEFT': Vector((min_x.x if flip else max_x.x, ymid, min_z.z)),
-            'EDGE_BOT_RIGHT': Vector((max_x.x if flip else min_x.x, ymid, min_z.z)),
-            'EDGE_BOT_FRONT': Vector((xmid, max_y.y, min_z.z)),
-            'EDGE_BOT_BACK': Vector((xmid, min_y.y, min_z.z)),
-            'EDGE_FRONT_LEFT': Vector((min_x.x if flip else max_x.x, max_y.y, zmid)),
-            'EDGE_FRONT_RIGHT': Vector((max_x.x if flip else min_x.x, max_y.y, zmid)),
-            'EDGE_BACK_LEFT': Vector((min_x.x if flip else max_x.x, min_y.y, zmid)),
-            'EDGE_BACK_RIGHT': Vector((max_x.x if flip else min_x.x, min_y.y, zmid)),
-        }
-        return edge_map.get(self.mode, Vector((xmid, ymid, zmid)))
-
-    def get_center_ideal_local(self, scene, min_x, max_x, min_y, max_y, min_z, max_z, xmid, ymid, zmid):
-        """Get ideal local position for face centers with flip support."""
-        flip = scene.orivot_flip_left_right
-
-        center_map = {
-            'CENTER_TOP': Vector((xmid, ymid, max_z.z)),
-            'CENTER_BOTTOM': Vector((xmid, ymid, min_z.z)),
-            'CENTER_LEFT': Vector((min_x.x if flip else max_x.x, ymid, zmid)),
-            'CENTER_RIGHT': Vector((max_x.x if flip else min_x.x, ymid, zmid)),
-            'CENTER_FRONT': Vector((xmid, max_y.y, zmid)),
-            'CENTER_BACK': Vector((xmid, min_y.y, zmid)),
-        }
-        return center_map.get(self.mode, Vector((xmid, ymid, zmid)))
-
     def get_mode_description(self, context):
-        """Get human-readable description of the mode."""
+        """Get human-readable description of the mode, with the axes it landed on."""
         scene = context.scene
-        flip = scene.orivot_flip_left_right
-
-        descriptions = {
+        fixed = {
             'CURSOR': "Origin to 3D Cursor",
-            'FACE_TOP': "Top Face (+Z)",
-            'FACE_BOTTOM': "Bottom Face (-Z)",
-            'FACE_LEFT': f"Left Face ({'-X' if flip else '+X'})",
-            'FACE_RIGHT': f"Right Face ({'+X' if flip else '-X'})",
-            'FACE_FRONT': "Front Face (+Y)",
-            'FACE_BACK': "Back Face (-Y)",
-        }
-
-        descriptions.update({
             'CENTER_GEOMETRY': "Geometry Centre", 'CENTER_BBOX': "BBox Centre",
             'CENTER_MASS': "Centre of Mass",
-        })
-        if self.mode in descriptions:
-            return descriptions[self.mode]
-        kind, _, rest = self.mode.partition("_")
-        words = rest.replace("BOT", "BOTTOM").replace("_", " ").title()
-        if kind == 'VERT' and len(rest) == 3:          # TLF -> Top Left Front
-            names = {'T': "Top", 'B': "Bottom", 'L': "Left", 'R': "Right", 'F': "Front"}
-            words = " ".join([names[rest[0]], names[rest[1]], "Front" if rest[2] == 'F' else "Back"])
-        return {'VERT': "Corner", 'EDGE': "Edge Midpoint", 'CENTER': "Face Centre"}.get(kind, "Snap") + \
-            (f" {words}" if words else "")
+        }
+        if self.mode in fixed:
+            return fixed[self.mode]
+        sides = common.mode_sides(self.mode)
+        kind = self.mode.partition("_")[0]
+        words = " ".join(s.title() for s in sides)
+        ax = common.mode_axis_text(self.mode, scene)
+        ax = f" ({ax})" if ax else ""
+        if kind == 'FACE':
+            return f"{words} Face{ax}"
+        return {'VERT': "Corner", 'EDGE': "Edge Midpoint", 'CENTER': "Face Centre"}.get(kind, "Snap") +             (f" {words}" if words else "") + ax

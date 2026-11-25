@@ -35,7 +35,10 @@ class OrivotConfig(bpy.types.PropertyGroup):
     front_axis: EnumProperty(items=[('LOCAL_Y_POS', "+Y", ""), ('LOCAL_Y_NEG', "-Y", ""),
                                     ('LOCAL_X_POS', "+X", ""), ('LOCAL_X_NEG', "-X", ""),
                                     ('LOCAL_Z_POS', "+Z", ""), ('LOCAL_Z_NEG', "-Z", "")],
-                             default='LOCAL_Y_POS')
+                             default='LOCAL_Y_NEG')
+    # 4.3.5: axis convention this configuration was saved under (0 = 4.3.4 or older,
+    # where +Y was the default front; migrate.py converts those once)
+    axis_rev: IntProperty(default=0, options={'HIDDEN'})
     offset_mode: EnumProperty(items=[('OFFSET', "Offset", ""), ('DIRECT', "Direct", "")],
                               default='OFFSET')
     offset_space: EnumProperty(items=[('WORLD', "World", ""), ('LOCAL', "Local", "")],

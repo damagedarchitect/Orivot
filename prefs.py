@@ -127,14 +127,14 @@ class OrivotAddonPreferences(bpy.types.AddonPreferences):
     default_front_axis: bpy.props.EnumProperty(
         name="Front Face Axis",
         items=[
-            ('LOCAL_Y_POS', "+Y  (Blender Default)", "Local +Y is front"),
-            ('LOCAL_Y_NEG', "−Y",                    "Local −Y is front"),
+            ('LOCAL_Y_POS', "+Y",                    "Local +Y is front"),
+            ('LOCAL_Y_NEG', "−Y  (Blender Default)", "Local −Y is front (Blender's Front view)"),
             ('LOCAL_X_POS', "+X  (UE5 Default)",     "Local +X is front"),
             ('LOCAL_X_NEG', "−X",                    "Local −X is front"),
             ('LOCAL_Z_POS', "+Z  (Top)",              "Local +Z is front"),
             ('LOCAL_Z_NEG', "−Z  (Bottom)",           "Local −Z is front"),
         ],
-        default='LOCAL_Y_POS',
+        default='LOCAL_Y_NEG',
         description="Default front-face axis designation"
     )
 
@@ -191,7 +191,10 @@ class OrivotAddonPreferences(bpy.types.AddonPreferences):
         description="Also append caught errors to orivot_log.txt in Blender's config folder")
 
     configs         : bpy.props.CollectionProperty(type=_configs.OrivotConfig)
-    named_groups    : bpy.props.CollectionProperty(type=op_tools.OrivotProNamedGroup)
+    # 4.3.5: axis convention these preferences were last converted to (0 = 4.3.4 or older,
+    # where +Y was the default front). migrate.py moves old +Y defaults to -Y once.
+    axis_rev        : bpy.props.IntProperty(default=0, options={'HIDDEN'})
+    named_groups   : bpy.props.CollectionProperty(type=op_tools.OrivotProNamedGroup)
 
     # ---- Pie Menu (Alt+Q) — fully customizable, Orivot Pro only ----
     pie_slot_w  : bpy.props.EnumProperty(name="West",      items=pie.ORIVOT_PIE_ACTIONS, default='LEFT',

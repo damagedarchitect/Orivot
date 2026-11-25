@@ -409,16 +409,137 @@ VALID_FRONT_AXES = {
 }
 
 
+# ---------------- Front Face Axis -> the six named sides ----------------
+# 4.3.5: Blender's front is -Y (Front view, Numpad 1, looks from -Y toward +Y, with +X on
+# the right). Up to 4.3.4 Orivot treated +Y as front and +X as left, i.e. a viewer standing
+# behind the object. Every snap, normal, preview and label now reads the sides from here.
+DEFAULT_FRONT_AXIS = 'LOCAL_Y_NEG'
+# Version of the axis convention stamped next to stored front axes (objects, configs,
+# preferences). Data without it was written by 4.3.4 or older, where +Y was the default.
+AXIS_REV = 1
+
+SIDES = ('FRONT', 'BACK', 'LEFT', 'RIGHT', 'TOP', 'BOTTOM')
+
+_AXIS_UNIT = {
+    'LOCAL_X_POS': Vector((1, 0, 0)), 'LOCAL_X_NEG': Vector((-1, 0, 0)),
+    'LOCAL_Y_POS': Vector((0, 1, 0)), 'LOCAL_Y_NEG': Vector((0, -1, 0)),
+    'LOCAL_Z_POS': Vector((0, 0, 1)), 'LOCAL_Z_NEG': Vector((0, 0, -1)),
+}
+# Up for each front: +Z, except when the front IS the Z axis. Then up is what the Top /
+# Bottom view shows at the top of the screen (+Y looking down, -Y looking up).
+_AXIS_UP = {
+    'LOCAL_Z_POS': Vector((0, 1, 0)), 'LOCAL_Z_NEG': Vector((0, -1, 0)),
+}
+
+
+def default_front_axis():
+    """The Front Face Axis from the preferences (falls back to Blender's -Y)."""
+    try:
+        p = bpy.context.preferences.addons[__package__].preferences
+        val = getattr(p, 'default_front_axis', None)
+        if val in VALID_FRONT_AXES:
+            return val
+    except Exception:
+        pass
+    return DEFAULT_FRONT_AXIS
+
+
 def get_obj_front_axis(obj, scene=None):
     """
-    Return the committed front axis for obj if one exists,
-    otherwise +Y (Blender default). Does NOT fall back to scene setting —
+    Return the committed front axis for obj if one exists, otherwise the preferences
+    default (Blender's -Y unless changed). Does NOT fall back to the scene setting —
     that's intentional to avoid circular reads when syncing the dropdown.
     """
     val = obj.get('orivot_front_axis') if obj else None
     if val in VALID_FRONT_AXES:
         return val
-    return 'LOCAL_Y_POS'
+    return default_front_axis()
+
+
+def front_axis_for(obj, scene, active=None):
+    """The front axis a snap uses for obj: the dropdown for the active object (what the
+    panel shows), the object's pinned axis for the others, else the dropdown."""
+    if obj is not None and obj is not active:
+        val = obj.get('orivot_front_axis')
+        if val in VALID_FRONT_AXES:
+            return val
+    val = getattr(scene, 'orivot_front_axis', None) if scene else None
+    return val if val in VALID_FRONT_AXES else DEFAULT_FRONT_AXIS
+
+
+def side_vectors(front_axis, flip=False):
+    """{'FRONT': Vector, ... 'BOTTOM': Vector}: the outward unit vector of each named side.
+    Left / Right are the viewer's, looking at the front (as Blender's Front view does);
+    flip swaps them (the object's own left / right)."""
+    f = _AXIS_UNIT.get(front_axis, _AXIS_UNIT[DEFAULT_FRONT_AXIS])
+    u = _AXIS_UP.get(front_axis, Vector((0, 0, 1)))
+    r = (-f).cross(u)                   # viewer looks along -f, up u -> screen right
+    if flip:
+        r = -r
+    return {'FRONT': f.copy(), 'BACK': -f, 'RIGHT': r, 'LEFT': -r, 'TOP': u.copy(), 'BOTTOM': -u}
+
+
+def side_frame(front_axis, flip=False):
+    """{'FRONT': ('Y', 'min'), ...}: the axis letter and extreme of each named side."""
+    out = {}
+    for side, v in side_vectors(front_axis, flip).items():
+        i = max(range(3), key=lambda k: abs(v[k]))
+        out[side] = ('XYZ'[i], 'max' if v[i] > 0 else 'min')
+    return out
+
+
+def scene_side_frame(scene, obj=None, active=None):
+    return side_frame(front_axis_for(obj, scene, active), getattr(scene, 'orivot_flip_left_right', False))
+
+
+def axis_text(vec):
+    """Vector((-1, 0, 1)) -> '-X+Z' (components in X, Y, Z order)."""
+    return "".join(f"{'+' if c > 0 else '-'}{a}" for a, c in zip("XYZ", vec) if abs(c) > 0.5)
+
+
+def side_labels(scene, front_axis=None):
+    """{'FRONT': '-Y', ...} for the scene's Front Face Axis and Left / Right swap."""
+    fa = front_axis or front_axis_for(None, scene)
+    vecs = side_vectors(fa, getattr(scene, 'orivot_flip_left_right', False))
+    return {s: axis_text(v) for s, v in vecs.items()}
+
+
+_SIDE_LETTER = {'T': 'TOP', 'B': 'BOTTOM', 'L': 'LEFT', 'R': 'RIGHT', 'F': 'FRONT'}
+
+
+def mode_sides(mode):
+    """The named sides a snap mode sits on: 'VERT_TLF' -> ('TOP', 'LEFT', 'FRONT'),
+    'EDGE_BOT_BACK' -> ('BOTTOM', 'BACK'), 'FACE_FRONT' -> ('FRONT',). () for the object
+    centres and anything else that is not on a side."""
+    kind, _, rest = (mode or "").partition("_")
+    if kind == 'VERT' and len(rest) == 3:
+        return (_SIDE_LETTER[rest[0]], _SIDE_LETTER[rest[1]], 'FRONT' if rest[2] == 'F' else 'BACK')
+    if kind in ('FACE', 'CENTER', 'EDGE'):
+        parts = tuple('BOTTOM' if p == 'BOT' else p for p in rest.split("_"))
+        if parts and all(p in SIDES for p in parts):
+            return parts
+    return ()
+
+
+def mode_axis_text(mode, scene, front_axis=None):
+    """'VERT_TLF' -> '-X-Y+Z' for the scene's Front Face Axis ('' for centres)."""
+    sides = mode_sides(mode)
+    if not sides:
+        return ""
+    fa = front_axis or front_axis_for(None, scene)
+    vecs = side_vectors(fa, getattr(scene, 'orivot_flip_left_right', False))
+    return axis_text(sum((vecs[s] for s in sides), Vector()))
+
+
+def side_point(sides, lo, hi, frame):
+    """Point on the box lo..hi (3 numbers each) on the given sides; the middle on every
+    axis no side constrains."""
+    p = [(lo[i] + hi[i]) / 2.0 for i in range(3)]
+    for s in sides:
+        ax, ext = frame[s]
+        i = 'XYZ'.index(ax)
+        p[i] = hi[i] if ext == 'max' else lo[i]
+    return Vector(p)
 
 
 def local_to_world(obj, v_local):

@@ -35,10 +35,6 @@ BASIC = RANK >= 1                       # Basic features available
 PRO = RANK >= 2                         # Pro features available
 FAB = RANK >= 3                         # Fabricator features available
 
-# Where the upgrade buttons point (Free: Basic + Pro + Fabricator, Basic: Pro, Pro: Fabricator).
-URL_BASIC = "https://discord.com/users/damagedarchitect"
-URL_PRO = "https://discord.com/users/damagedarchitect"
-URL_FAB = "https://discord.com/users/damagedarchitect"
 
 # Prices shown in the upgrade tooltips (4.3). Launch prices apply until LAUNCH_UNTIL
 # (inclusive, ISO date); after that the tooltips show the list price only.

@@ -24,6 +24,7 @@ from . import help as _help
 from . import tier
 from . import support
 from . import icons
+from . import migrate
 
 CATEGORY = "Orivot"
 
@@ -127,7 +128,7 @@ class VIEW3D_PT_orivot_origin(_Panel, bpy.types.Panel):
             return
         if context.mode == 'EDIT_MESH':
             r = layout.row()
-            r.label(text="Edit Mode origin tools: Orivot Basic", icon='EDITMODE_HLT')
+            r.label(text="Origin snaps work in Object Mode", icon='INFO')
             return
         box = layout.box()
         hdr = box.row(align=True)
@@ -140,6 +141,7 @@ class VIEW3D_PT_orivot_origin(_Panel, bpy.types.Panel):
         row = box.row(align=True)
         row.label(text="Front:", icon='ORIENTATION_LOCAL')
         row.prop(scene, "orivot_front_axis", text="")
+        migrate.draw_front_axis_warning(box)   # 4.3.5: file still on the old +Y front
         return
 
 
@@ -184,8 +186,8 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
         if not (_mesh_active(context) or any(o.type == 'MESH' for o in context.selected_objects)):
             layout.label(text="Select a mesh object", icon='INFO')
             return
-        flip = scene.orivot_flip_left_right
-        L, R = ("-X", "+X") if flip else ("+X", "-X")
+        # 4.3.5: the axes come from the Front Face Axis (Blender's front is -Y)
+        ax = _pkg().side_labels(scene)
 
         def section(prop, title):
             on = getattr(scene, prop)
@@ -197,9 +199,9 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
 
         col = section("orivot_show_faces", "Faces (extreme sides)")
         if col:
-            r = col.row(align=True); _op(r, "Top (+Z)", 'FACE_TOP'); _op(r, "Bottom (-Z)", 'FACE_BOTTOM')
-            r = col.row(align=True); _op(r, "Front (+Y)", 'FACE_FRONT'); _op(r, "Back (-Y)", 'FACE_BACK')
-            r = col.row(align=True); _op(r, f"Left ({L})", 'FACE_LEFT'); _op(r, f"Right ({R})", 'FACE_RIGHT')
+            r = col.row(align=True); _op(r, f"Top ({ax['TOP']})", 'FACE_TOP'); _op(r, f"Bottom ({ax['BOTTOM']})", 'FACE_BOTTOM')
+            r = col.row(align=True); _op(r, f"Front ({ax['FRONT']})", 'FACE_FRONT'); _op(r, f"Back ({ax['BACK']})", 'FACE_BACK')
+            r = col.row(align=True); _op(r, f"Left ({ax['LEFT']})", 'FACE_LEFT'); _op(r, f"Right ({ax['RIGHT']})", 'FACE_RIGHT')
         col = section("orivot_show_vertices", "Corners")
         if col:
             for top, z in (("Top", "+Z"), ("Bottom", "-Z")):
@@ -208,7 +210,7 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
                 _op(r, f"{top} L-Front", f'VERT_{t}LF'); _op(r, f"{top} R-Front", f'VERT_{t}RF')
                 r = col.row(align=True)
                 _op(r, f"{top} L-Back", f'VERT_{t}LB'); _op(r, f"{top} R-Back", f'VERT_{t}RB')
-            col.label(text=f"Left = {L}, Front = +Y", icon='INFO')
+            col.label(text=f"Left = {ax['LEFT']}, Front = {ax['FRONT']}", icon='INFO')
         col = section("orivot_show_edges", "Edge Midpoints")
         if col:
             col.label(text="Top ring:")
@@ -224,7 +226,7 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
         if col:
             r = col.row(align=True); _op(r, "Top", 'CENTER_TOP'); _op(r, "Bottom", 'CENTER_BOTTOM')
             r = col.row(align=True); _op(r, "Front", 'CENTER_FRONT'); _op(r, "Back", 'CENTER_BACK')
-            r = col.row(align=True); _op(r, f"Left ({L})", 'CENTER_LEFT'); _op(r, f"Right ({R})", 'CENTER_RIGHT')
+            r = col.row(align=True); _op(r, f"Left ({ax['LEFT']})", 'CENTER_LEFT'); _op(r, f"Right ({ax['RIGHT']})", 'CENTER_RIGHT')
         col = section("orivot_show_global_centers",
                       ("Object Centers"))
         if col:
@@ -240,18 +242,6 @@ class VIEW3D_PT_orivot_points(_Panel, bpy.types.Panel):
 # ══════════════════════════════════════════════════════════════════════════════
 # SETTINGS
 # ══════════════════════════════════════════════════════════════════════════════
-
-def upgrade_buttons(layout):
-    """Free only: one full-width row of heart buttons (Basic | Pro | Fabricator), the last
-    line of the Settings panel (a panel of its own would bring a collapse arrow, or sit at
-    the top without a header). Red hearts: Basic / Pro, blue heart: Fabricator. What each
-    edition adds is in the tooltips (ORIVOT_OT_open_upgrade.description)."""
-    layout.separator()
-    row = layout.row(align=True)
-    row.operator("orivot.open_upgrade", text="Basic", **icons.kw("heart_red")).edition = 'BASIC'
-    row.operator("orivot.open_upgrade", text="Pro", **icons.kw("heart_red")).edition = 'PRO'
-    row.operator("orivot.open_upgrade", text="Fabricator", **icons.kw("heart_blue")).edition = 'FAB'
-
 
 def upgrade_hearts(row, context):
     """Paid editions: icon-only hearts at the end of the Help Buttons row.
@@ -304,7 +294,6 @@ class VIEW3D_PT_orivot_settings(_Panel, bpy.types.Panel):
         col = self.layout.column(align=True)
         col.prop(context.scene, "orivot_flip_left_right", text="Swap Left / Right labels")
         col.prop(context.scene, "orivot_show_mode_indicator", text="Mode indicator in viewport")
-        upgrade_buttons(self.layout)
 
 
 ORIGIN_PANELS = (VIEW3D_PT_orivot_origin, VIEW3D_PT_orivot_quick, VIEW3D_PT_orivot_points)

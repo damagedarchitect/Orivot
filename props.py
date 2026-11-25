@@ -429,20 +429,21 @@ def _register_props():
     bpy.types.Scene.orivot_front_axis = bpy.props.EnumProperty(
         name="Front Face Axis",
         description=(
-            "Override which local axis is treated as 'front' for the highlight quad and arrow. "
-            "Does not modify the mesh or rotation — only affects the preview visualization. "
+            "Which local axis is the object's front. Front / Back / Left / Right / Top / Bottom "
+            "snaps, their labels and the preview highlight all follow it (Left / Right as seen "
+            "from the front). Does not modify the mesh or rotation. "
             "Use this to homogenize arrow direction across objects with different orientations, "
             "or to match export conventions (e.g. UE5 uses +X as forward)"
         ),
         items=[
-            ('LOCAL_Y_POS', "+Y  (Blender Default)",  "Local +Y is front — Blender's default forward axis"),
-            ('LOCAL_Y_NEG', "−Y",                     "Local −Y is front"),
+            ('LOCAL_Y_POS', "+Y",                     "Local +Y is front (the back in Blender's own views)"),
+            ('LOCAL_Y_NEG', "−Y  (Blender Default)",  "Local −Y is front — what Blender's Front view (Numpad 1) looks at"),
             ('LOCAL_X_POS', "+X  (UE5 Default)",      "Local +X is front — matches Unreal Engine's forward axis"),
             ('LOCAL_X_NEG', "−X",                     "Local −X is front"),
             ('LOCAL_Z_POS', "+Z  (Top)",               "Local +Z is front — top face"),
             ('LOCAL_Z_NEG', "−Z  (Bottom)",            "Local −Z is front — bottom face"),
         ],
-        default='LOCAL_Y_POS',
+        default='LOCAL_Y_NEG',
         update=preview.origin_preview_orientation_update  # reuse — triggers preview refresh
     )
 
@@ -494,7 +495,7 @@ def _register_props():
         name="Align Axis",
         description="Local axis that will face the surface normal after Surface Align",
         items=[('+Z',"+Z (Up)",""),('-Z',"−Z (Down)",""),
-               ('+Y',"+Y (Forward)",""),('-Y',"−Y (Back)",""),
+               ('+Y',"+Y (Back)",""),('-Y',"−Y (Front)",""),
                ('+X',"+X (Right)",""),('-X',"−X (Left)","")],
         default='+Z',
     )

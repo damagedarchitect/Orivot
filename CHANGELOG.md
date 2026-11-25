@@ -1,5 +1,14 @@
 # Changelog - Orivot Free
 
+## 4.3.5
+
+- **Front is now −Y, as in Blender.** Blender's Front view (Numpad 1) looks from −Y with +X on the right. Up to 4.3.4 Orivot called +Y the Front and +X the Left, as if seen from behind. Now Front −Y, Back +Y, Left −X, Right +X, Top +Z.
+- **Every snap follows the Front Face Axis.** Before, the setting only moved the preview highlight. Now the faces, corners, edge midpoints and face centres all use it, and **Swap Left / Right** still switches to the object's own sides.
+- **Labels name the real axes:** "Front (−Y)", "Top Left Front (−X−Y+Z)" in the panel, menus and pie.
+- **Old files: Fix button.** Opening a file changes nothing. If it still has the old +Y front (objects pinned by 4.3.4 or earlier, Saved Configurations), the panel shows "Old Orivot front (+Y) on N item(s)" and a **Fix: Front = −Y** button (one undo step). A +Y you pick in 4.3.5 is left alone. There is no switch back to the old behaviour: a model that really faces +Y gets Front Face Axis +Y.
+- Links in the add-on (Docs, Report a Bug) point to this GitHub page.
+- Tested headless on Blender 5.3 and 4.5 LTS (158 tests, install from the zip). No errors.
+
 ## 4.3.3
 
 - **Faster on big selections:** snapping the origins of 1600 objects at once takes about 0.7 s (1.2 s before). Moving origins asked Blender for each object's children, which walks the whole file every time.

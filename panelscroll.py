@@ -131,7 +131,7 @@ def _disable(reason):
     global _disabled
     if not _disabled:
         _disabled = True
-        print(f"[Orivot Pro] panel scroll memory disabled: {reason}")
+        print(f"[Orivot] panel scroll memory disabled: {reason}")
 
 
 def _step_area(win, area, region, mode, category, st):

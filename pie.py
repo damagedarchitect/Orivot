@@ -61,12 +61,12 @@ def _pkg():
 # Used both as the EnumProperty items for the 8 slot preferences and as the
 # dispatch key when drawing the pie itself, so the two never drift apart.
 ORIVOT_PIE_ACTIONS = [
-    ('LEFT',              "Left (+X)",         "Snap origin to the -X extreme face",                    'TRIA_LEFT',      1),
-    ('RIGHT',             "Right (-X)",        "Snap origin to the +X extreme face",                    'TRIA_RIGHT',     2),
-    ('BOTTOM',            "Bottom (-Z)",       "Snap origin to the bottom extreme face",                'TRIA_DOWN',      3),
-    ('TOP',                "Top (+Z)",         "Snap origin to the top extreme face",                   'TRIA_UP',        4),
-    ('BACK',               "Back (-Y)",        "Snap origin to the back extreme face",                  'BACK',           5),
-    ('FRONT',              "Front (+Y)",       "Snap origin to the front extreme face",                 'FORWARD',        6),
+    ('LEFT',              "Left",              "Snap origin to the left extreme face (-X with the default Front Face Axis)",   'TRIA_LEFT',      1),
+    ('RIGHT',             "Right",             "Snap origin to the right extreme face (+X with the default Front Face Axis)",  'TRIA_RIGHT',     2),
+    ('BOTTOM',            "Bottom",            "Snap origin to the bottom extreme face",                'TRIA_DOWN',      3),
+    ('TOP',                "Top",              "Snap origin to the top extreme face",                   'TRIA_UP',        4),
+    ('BACK',               "Back",             "Snap origin to the back extreme face (+Y with the default Front Face Axis)",   'BACK',           5),
+    ('FRONT',              "Front",            "Snap origin to the front extreme face (-Y with the default Front Face Axis)",  'FORWARD',        6),
     ('SURFACE_SNAP',       "Surface Snap",     "Interactively snap origin to a clicked surface point",  'PIVOT_CURSOR',   7),
     ('VERTEX_SNAP',        "Vertex Snap",      "Drag across the mesh to snap origin to the nearest vertex", 'VERTEXSEL',  8),
     ('CENTER_GEOMETRY',    "Center Geometry",  "Snap origin to the geometric center",                   'PIVOT_MEDIAN',   9),
@@ -127,12 +127,12 @@ _EXTREME = "orivot.set_origin_extreme_full"
 # Single-button actions: id -> (operator, properties, label, icon). The pie, the
 # Run Action operator (hotkeys) and the tests all read this one table.
 ACTION_OPS = {
-    'LEFT':                (_EXTREME, {'mode': 'FACE_LEFT'},   "Left (+X)",   'TRIA_LEFT'),
-    'RIGHT':               (_EXTREME, {'mode': 'FACE_RIGHT'},  "Right (-X)",  'TRIA_RIGHT'),
-    'BOTTOM':              (_EXTREME, {'mode': 'FACE_BOTTOM'}, "Bottom (-Z)", 'TRIA_DOWN'),
-    'TOP':                 (_EXTREME, {'mode': 'FACE_TOP'},    "Top (+Z)",    'TRIA_UP'),
-    'BACK':                (_EXTREME, {'mode': 'FACE_BACK'},   "Back (-Y)",   'BACK'),
-    'FRONT':               (_EXTREME, {'mode': 'FACE_FRONT'},  "Front (+Y)",  'FORWARD'),
+    'LEFT':                (_EXTREME, {'mode': 'FACE_LEFT'},   "Left",   'TRIA_LEFT'),
+    'RIGHT':               (_EXTREME, {'mode': 'FACE_RIGHT'},  "Right",  'TRIA_RIGHT'),
+    'BOTTOM':              (_EXTREME, {'mode': 'FACE_BOTTOM'}, "Bottom", 'TRIA_DOWN'),
+    'TOP':                 (_EXTREME, {'mode': 'FACE_TOP'},    "Top",    'TRIA_UP'),
+    'BACK':                (_EXTREME, {'mode': 'FACE_BACK'},   "Back",   'BACK'),
+    'FRONT':               (_EXTREME, {'mode': 'FACE_FRONT'},  "Front",  'FORWARD'),
     'CENTER_GEOMETRY':     (_EXTREME, {'mode': 'CENTER_GEOMETRY'}, "Center Geometry", 'PIVOT_MEDIAN'),
     'CENTER_BBOX':         (_EXTREME, {'mode': 'CENTER_BBOX'}, "Center BBox", 'PIVOT_BOUNDBOX'),
     'CENTER_MASS':         (_EXTREME, {'mode': 'CENTER_MASS'}, "Center Mass", 'MOD_PHYSICS'),
@@ -168,6 +168,13 @@ def _orivot_pie_draw_action(layout, action, prefs):
     entry = ACTION_OPS.get(action)
     if entry is not None:
         idname, props, text, icon = entry
+        if action in ('LEFT', 'RIGHT', 'BOTTOM', 'TOP', 'BACK', 'FRONT'):
+            # 4.3.5: the axis follows the Front Face Axis (Blender's front is -Y)
+            try:
+                from . import common
+                text = f"{text} ({common.side_labels(bpy.context.scene)[action]})"
+            except Exception:
+                pass
         op = layout.operator(idname, text=text, icon=icon)
         for k, v in props.items():
             setattr(op, k, v)

@@ -24,7 +24,8 @@ TOPICS = {
                 "The mesh never moves, so nothing in your scene shifts.",
                 "Snap Source: Mesh = real geometry, BBox = bounding box, Cursor = 3D cursor. "
                 "Orientation: Local follows the object's rotation, Global uses world axes.",
-                "Front: which local axis is the object's front. Pin it to store it on the object."],
+                "Front: which local axis is the object's front (Blender's front is -Y). "
+                "Left / Right are as seen from the front. Pin it to store it on the object."],
         "edit": ["In Edit Mode the origin is placed from the current selection."]}),
     "quick": ("Quick Snap", "quick", {
         "object": ["Surface: click anywhere on the mesh, the origin lands there. "
